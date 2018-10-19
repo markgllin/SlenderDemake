@@ -16,14 +16,15 @@ SCRN_LSB    = $00	; LSB of screen memory address
 SCRN_MSB    = $01	; MSB Of screen memory address	
 CLRM_LSB    = $04	; LSB of colour memory address
 CLRM_MSB    = $05	; MSB Of colour memory address
-CURR_SPRITE = $08	
+CURR_SPRITE = $08
+FRAME	    = $09	
 
 ;;; ---- CONSTANTS
-CHAR_FORWARD = #$00	; character facing forward
-CHAR_BCKWARD = #$01	; character facing backward
-CHAR_SIDE    = #$02	; character facing to the right
-FRAME        = #$03	; frame counter
-	
+CHAR_FORWARD      = #$00	; character facing forward
+CHAR_BCKWARD      = #$01	; character facing backward
+CHAR_SIDE         = #$02	; character facing to the right
+SPRITE_CHAR_COLOR = #$09 	; multi-colour  white
+
 	processor	6502
 	org		$1001
 
@@ -71,7 +72,7 @@ load:	lda	sprite,X
 	lda	#$96		; load MSB
 	sta	CLRM_MSB
 	
-	lda	CHAR_FORWARD
+	lda	#CHAR_FORWARD
 	sta	CURR_SPRITE
 	jsr	drawChar
 	
@@ -176,7 +177,7 @@ drawChar:
 ; needs offset in y
 ; needs character color in a
 draw:
-	lda	sprite_char_color
+	lda	#SPRITE_CHAR_COLOR
 	sta	(CLRM_LSB),y
 	txa
 	sta 	(SCRN_LSB),y
@@ -201,18 +202,14 @@ startFrame:
 	sta	FRAME	
 frame:	
 	lda	RASTER		; raster beam line number
-	cmp	#$0		; top of the screen
 	bne	frame
 	inc	FRAME		; increase frame counter
 	lda	FRAME
-	cmp	#$40		; add delay
+	cmp	#$15		; add delay
 	bne	frame
 	rts
 
 ;;; ---- SPRITES AND STUFF
-	
-sprite_char_color:
-	BYTE	$09,$09,$09,$0f
 	
 sprite:
 	;;  sprite facing forward
