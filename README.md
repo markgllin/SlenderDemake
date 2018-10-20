@@ -1,8 +1,11 @@
 TODO:
 - maze generation
-- sprite design
+- ~~sprite design~~
 - audio
-- collision detection
+- ~~collision detection~~
+
+  Basic idea is done but could use some refactoring.
+  
 - title screen
 - end game screen
 - score
