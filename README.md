@@ -1,4 +1,5 @@
 TODO:
+- psrng (LFSR)
 - maze generation
 - sprite design
 - audio
