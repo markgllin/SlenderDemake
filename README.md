@@ -3,6 +3,7 @@ TODO:
 - sprite design
 - audio
 - ~~collision detection~~
+
   Basic idea is done but could use some refactoring.
   
 - title screen
