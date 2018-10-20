@@ -16,16 +16,27 @@ SCRN_LSB    = $00	; LSB of screen memory address
 SCRN_MSB    = $01	; MSB Of screen memory address	
 CLRM_LSB    = $04	; LSB of colour memory address
 CLRM_MSB    = $05	; MSB Of colour memory address
-CURR_SPRITE = $08
-FRAME	    = $09	
+	
+CURR_SPRITE = $08	; stores the starting character for current sprite
+FRAME	    = $09	; frame counter for delays
+CURR_CLR    = $0a	; stores the current character colour
 
+PREV_SCRN_LSB = $10	
+PREV_SCRN_MSB = $11
+PREV_CLRM_LSB = $14
+PREV_CLRM_MSB = $15
+	
+	
 ;;; ---- CONSTANTS
 CHAR_FORWARD      = #$00	; character facing forward
 CHAR_BCKWARD      = #$04	; character facing backward
 CHAR_RIGHT        = #$08	; character facing to the right
 CHAR_LEFT         = #$0c	; character facing to the left
-SPRITE_CHAR_COLOR = #$09 	; multi-colour  white
+TREE1             = #$10	
 
+SPRITE_CHAR_COLOR = #$09 	; multi-colour white
+TREE_CHAR_COLOR   = #$0d	; multi-colour green
+	
 	processor	6502
 	org		$1001
 
@@ -35,9 +46,10 @@ SPRITE_CHAR_COLOR = #$09 	; multi-colour  white
 end:	dc.w	0
 
 start:
-	lda	#12	; border purple, screen black (ref p. 265)
+	lda	#14	; border blue, screen black (ref p. 265)
 	sta 	SCR_C
-	lda	#144	; light orange (ref p. 264)
+	lda	#112	; yellow = first byte 7 (ref p. 264)
+			; 112 = 0111 0000 where 111 = 7
 	sta	AUX_C
 	lda	#01	; white characters
 	sta	CHR_C
@@ -58,10 +70,9 @@ clear_loop:			; clear the screen
 load:	lda	sprite,X
   	sta	CHAR_MEM,X	
   	inx
-  	cpx	#128
+  	cpx	#160
   	bne	load
 
-	
 	;; store screen address for calculations later  
 	lda 	#$00            ; load LSB
 	sta 	SCRN_LSB
@@ -70,10 +81,28 @@ load:	lda	sprite,X
 
 	;; store the colour memory address for calculations later
 	lda	#$00		; load LSB
-	sta	CLRM_LSB		
+	sta	CLRM_LSB
 	lda	#$96		; load MSB
 	sta	CLRM_MSB
 	
+draw_tree:
+	lda	#$e6		; offset tree
+	sta	SCRN_LSB
+	sta	CLRM_LSB
+	
+	lda	#TREE_CHAR_COLOR
+	sta	CURR_CLR
+	lda	#TREE1
+	sta	CURR_SPRITE
+	jsr	drawChar
+
+	lda	#$00		; reset offset
+	sta	SCRN_LSB
+	sta	CLRM_LSB
+
+draw_sprite:
+	lda	#SPRITE_CHAR_COLOR
+	sta	CURR_CLR
 	lda	#CHAR_FORWARD
 	sta	CURR_SPRITE
 	jsr	drawChar
@@ -91,24 +120,34 @@ input
 	cmp 	#18     ;d
 	beq 	right
 	jmp 	input
-up:	
-	ldy 	#0
-	jsr 	erase
-	ldy 	#22	
+up:
+	jsr	erase
+	ldy 	#22
 	jsr 	subOffset
 	
 	lda	#CHAR_BCKWARD
 	sta	CURR_SPRITE
 	jmp 	doneInput
-down:	
+down:
+	;; check valid movement
+	;; ldy	#$2c
+	;; lda	(SCRN_LSB),y
+	;; cmp	#$20
+	;; bne	doneInput
+	;; iny
+	;; lda	(SCRN_LSB),y
+	;; cmp	#$20
+	;; bne	doneInput
+	
+	;; valid movement
 	jsr 	erase
-	ldy 	#22
+	ldy 	#$16
 	jsr 	addOffset
 	
 	lda	#CHAR_FORWARD
 	sta	CURR_SPRITE
 	jmp 	doneInput
-left:	
+left:
 	jsr 	erase
 	ldy 	#1
 	jsr 	subOffset
@@ -116,24 +155,78 @@ left:
 	lda	#CHAR_LEFT
 	sta	CURR_SPRITE
 	jmp 	doneInput
-right:	
+right:
+	;; check valid movement
+	;; ldy	#2
+	;; lda	(SCRN_LSB),y
+	;; cmp	#$20
+	;; bne	doneInput
+	;; ldy	#$18
+	;; lda	(SCRN_LSB),y
+	;; cmp	#$20
+	;; bne	doneInput
+
+	;; movement is valid
 	jsr 	erase
 	ldy 	#1
 	jsr 	addOffset
 
 	lda	#CHAR_RIGHT
 	sta	CURR_SPRITE
-doneInput:	
+doneInput:
+	jsr	check_movement
 	jsr	drawChar
 	jmp	input
 
 ;;; ----- MOVEMENT ROUTINES
+check_movement:
+	ldy	#$00		; top left corner
+	lda	(SCRN_LSB),y
+	cmp	#$20
+	bne	invalid_movement
+	ldy	#$01		; top right corner
+	lda	(SCRN_LSB),y
+	cmp	#$20
+	bne	invalid_movement
+	ldy	#$16		; bottom left corner
+	lda	(SCRN_LSB),y
+	cmp	#$20
+	bne	invalid_movement
+	ldy	#$17		; bottom right corner
+	lda	(SCRN_LSB),y
+	cmp	#$20
+	bne	invalid_movement
+	;; valid movement
+	rts
+invalid_movement:
+	;; restore previous
+	lda	PREV_SCRN_LSB
+	sta	SCRN_LSB
+	lda	PREV_SCRN_MSB
+	sta	SCRN_MSB
+	lda	PREV_CLRM_LSB
+	sta	CLRM_LSB
+	lda	PREV_CLRM_MSB
+	sta	CLRM_MSB
+	rts
+	
+save_previous:
+	lda	SCRN_LSB
+	sta	PREV_SCRN_LSB
+	lda	SCRN_MSB
+	sta	PREV_SCRN_MSB
+	lda	CLRM_LSB
+	sta	PREV_CLRM_LSB
+	lda	CLRM_MSB
+	sta	PREV_CLRM_MSB
+	rts
 
 ; needs move increment in Y register
-addOffset
-  	tya                     ;2      ; move increment in acumulator
+addOffset:
+	jsr	save_previous
+	tya                     ;2      ; move increment in acumulator
   	clc                     ;2      ; clear the carry
-  	adc 	SCRN_LSB        ;3      ; add to LSB
+  	adc 	SCRN_LSB    	;3      ; add to LSB
   	sta 	SCRN_LSB	;3      ; store result in LSB
 
 	tya			;2
@@ -149,12 +242,13 @@ addOffset
 addOffset_no_carry:	; total no carry: 22 cycles
  	rts		; total with carry: 32 cycles
 	
-subOffset
-	lda 	SCRN_LSB        ;3
-	sty 	SCRN_LSB       	;3
+subOffset:
+	jsr	save_previous
+	Lda 	SCRN_LSB    	;3
+	sty 	SCRN_LSB   	;3
 	sec			;2     ; clear the borrow
-	sbc 	SCRN_LSB       	;3     ; sub from LSB
-	sta 	SCRN_LSB       	;3     ; store result in LSB
+	sbc 	SCRN_LSB    	;3     ; sub from LSB
+	sta 	SCRN_LSB    	;3     ; store result in LSB
 
 	lda	CLRM_LSB	;3
 	sty	CLRM_LSB	;3
@@ -164,11 +258,12 @@ subOffset
 
 	bcs	subOffset_no_borrow ;~2
 
-	dec	SCRN_MSB       	;3
+	dec	SCRN_MSB    ;3
 	dec	CLRM_MSB	;3
 	
 subOffset_no_borrow:	; total without borrow: 30
-	rts      	; total with borrow: 36
+			; total with borrow: 36
+	rts      
 	
 ;;; ----- DRAWING ROUTINES
 
@@ -188,9 +283,8 @@ drawChar:
 	
 ; needs sprite in X 
 ; needs offset in y
-; needs character color in a
 draw:
-	lda	#SPRITE_CHAR_COLOR
+	lda	CURR_CLR
 	sta	(CLRM_LSB),y
 	txa
 	sta 	(SCRN_LSB),y
@@ -198,13 +292,13 @@ draw:
 
 erase:	
 	ldx	#32     ; load blank
-	ldy	#0
+	ldy	#$00
 	jsr 	draw
-	ldy 	#1
+	ldy 	#$01
 	jsr 	draw
-	ldy 	#22
+	ldy 	#$16
 	jsr 	draw
-	ldy 	#23
+	ldy 	#$17
 	jsr 	draw
 	rts
 	
@@ -249,3 +343,8 @@ sprite:
 	BYTE	84,85,85,149,149,213,148,85
 	BYTE	208,244,244,244,253,85,4,4
 	
+tree1:
+	BYTE	1,1,7,1,7,30,7,30
+	BYTE	26,122,30,122,85,1,1,5
+	BYTE	64,64,144,64,144,164,144,164
+	BYTE	164,169,164,169,85,64,64,80
