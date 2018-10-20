@@ -1,6 +1,6 @@
 TODO:
 - maze generation
-- sprite design
+- ~~sprite design~~
 - audio
 - ~~collision detection~~
 
