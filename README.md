@@ -17,6 +17,7 @@ TODO:
 
   **a34_end_game_condition.asm:** I think this is mostly done. Sprite code + timer code together along with the game ending (i.e. player is unable to move and timer stops) when time runs out. 
 
+- flashlight effect
 
 Maybes
 - text box (e.g. 'You here some rustling')
