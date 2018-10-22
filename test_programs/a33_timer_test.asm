@@ -57,7 +57,7 @@ CHAR_RIGHT        = #$08	; character facing to the right
 CHAR_LEFT         = #$0c	; character facing to the left
 TREE1             = #$10	
 NUM_ZERO	  = #$14	; start of number 0
-NUM_NINE	  = #$1e	; end of number 9 
+NUM_NINE	  = #$1d	; start of number 9 
 	
 SPRITE_CHAR_COLOR = #$09 	; multi-colour white
 TREE_CHAR_COLOR   = #$0d	; multi-colour green
@@ -134,19 +134,21 @@ init_numbers:
 	sta	SCRN_MSB
 	lda	#$96
 	sta	CLRM_MSB
-	
-	ldy	#$0
-	
+
+	ldy	#$0	
 init_loop:	
-	lda	#NUM_ZERO		; number 0
+	lda	#NUM_ZERO 		; number 0
 	sta	(SCRN_LSB),y		; position
-	lda	#$01
+	lda	#$01			; font color = white
 	sta	(CLRM_LSB),y
 	iny
 	cpy	#$04
 	bne	init_loop
 
-
+	ldy	#$01
+	lda	#NUM_ZERO + 3		; number 3
+	sta	(SCRN_LSB),y
+	
 	lda	#NUM_SEC
 	sta	TIMER_CTR
 start_timer:
@@ -182,20 +184,48 @@ isr_update_timer:
 isr_second_passed:	
 	lda	#NUM_SEC	; reload counter
 	sta	TIMER_CTR
-	
+
+isr_first_digit:		; check the seconds digit
 	ldy	#$03
 	lda	(SCRN_LSB),y
-	clc
-	adc	#$01
-	cmp	#NUM_NINE
-	beq	isr_wrap_around
-	
+	cmp	#NUM_ZERO
+	beq	isr_first_wrap_around
+
+	sec
+	sbc	#$01	
 	sta	(SCRN_LSB),y
 	jmp	isr_done_update
-	rti
+	
+isr_first_wrap_around:
+	lda	#NUM_NINE
+	sta	(SCRN_LSB),y
 
-isr_wrap_around:
-	lda	#NUM_ZERO
+	ldy	#$02		; check second digit
+	lda	(SCRN_LSB),y
+	cmp	#NUM_ZERO
+	beq	isr_second_wrap_around
+
+	sec
+	sbc	#$01
+	sta	(SCRN_LSB),y
+	jmp	isr_done_update
+	
+isr_second_wrap_around:	
+	lda	#NUM_NINE
+	sta	(SCRN_LSB),y
+	
+	ldy	#$01		; check third digit
+	lda	(SCRN_LSB),y
+	cmp	#NUM_ZERO
+	beq	isr_third_wrap_around
+
+	sec
+	sbc	#$01
+	sta	(SCRN_LSB),y
+	jmp	isr_done_update
+
+isr_third_wrap_around:
+	lda	#NUM_NINE
 	sta	(SCRN_LSB),y
 	
 isr_done_update:
