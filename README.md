@@ -1,6 +1,6 @@
 TODO:
-- psrng (LFSR)
-- maze generation
+- ~~psrng (LFSR)~~
+- maze generation - so many bugs ):
 - ~~sprite design~~
 - audio
 - ~~collision detection~~
