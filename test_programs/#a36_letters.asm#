@@ -13,8 +13,6 @@ SCRN_V    = $9001	; vertical origin of the screen
 ROWS	  = $9003	; bits 1-6: number of rows (ref: p 175)
 RASTER	  = $9004
 
-NUMBERS_ADDRESS = $1ca0		; where numbers start in custom charset
-
 ;; The IRQ vector is the location (ISR) to jump when an interrupt happens
 IRQ_L        = $0314		; low byte of IRQ vector 
 IRQ_H        = $0315		; high byte of IRQ vector 
@@ -31,13 +29,19 @@ TIMER1_HOL   = $9117		; timer 1 high order latch
 	
 TIMER2_L     = $9118		; timer 2 low order byte
 TIMER2_H     = $9119		; timer 2 high order byte
-	
+
+;;; CUSTOM CHARSET ADDRESSES
+SPACE_ADDRESS   = $1c00   	; where the space character starts
+SPRITE_ADDRESS  = $1c08		; where the sprites start
+NUMBERS_ADDRESS = $1cb8		; where numbers start in custom charset
 	
 ;;; ---- ZERO PAGE
 SCRN_LSB    = $00	; LSB of screen memory address
 SCRN_MSB    = $01	; MSB Of screen memory address	
 CLRM_LSB    = $04	; LSB of colour memory address
 CLRM_MSB    = $05	; MSB Of colour memory address
+
+GAME_STATUS = $07	; if this is 0, end game
 	
 CURR_SPRITE = $08	; stores the starting character for current sprite
 FRAME	    = $09	; frame counter for delays
@@ -46,13 +50,17 @@ TIMER_CTR   = $0b	; timer counter
 NUM_WRAPS   = $0c	; used to figure out end game condition
 	                ; basically, counts the number of times the numbers wrap per decrement 
 	                ; If this reaches 3, then FULL WRAP AROUND so end game 
-GAME_STATUS = $0d	; if this is 0, end game
+SPRITE_X = $0d
+SPRITE_Y = $0e
+SPRITE_PREV_X = $0f
+SPRITE_PREV_Y = $10	
+	
 	
 ;; save the previous position of sprite incase invalid movement 
-PREV_SPRITE_LSB     = $10	
-PREV_SPRITE_MSB     = $11
-PREV_SPRITE_CLR_LSB = $14
-PREV_SPRITE_CLR_MSB = $15
+PREV_SPRITE_LSB     = $11	
+PREV_SPRITE_MSB     = $12
+PREV_SPRITE_CLR_LSB = $15
+PREV_SPRITE_CLR_MSB = $16
 
 ;; current / proposed movement of sprite 
 SPRITE_LSB	 = $18
@@ -60,16 +68,23 @@ SPRITE_MSB       = $19
 SPRITE_CLR_LSB   = $1a
 SPRITE_CLR_MSB   = $1b
 
+LETTER_LSB 	 = $1e
+LETTER_MSB	 = $1f
+
+SCORE_LSB	 = $20
+SCORE_MSB	 = $21	
 	
 ;;; ---- CONSTANTS
-CHAR_FORWARD      = #$00	; character facing forward
-CHAR_BCKWARD      = #$04	; character facing backward
-CHAR_RIGHT        = #$08	; character facing to the right
-CHAR_LEFT         = #$0c	; character facing to the left
-TREE1             = #$10	
-NUM_ZERO	  = #$14	; start of number 0
-NUM_NINE	  = #$1d	; start of number 9 
-	
+SPACE             = #$00	; @
+CHAR_FORWARD      = #$01	; A = character facing forward
+CHAR_BCKWARD      = #$05	; E = character facing backward
+CHAR_RIGHT        = #$09	; I = character facing to the right
+CHAR_LEFT         = #$0d	; M = character facing to the left
+TREE1             = #$11	; Q = tree sprite  
+ITEM_LETTER	  = #$15 	; U = letter sprite
+NUM_ZERO	  = #$17	; W = start of number 0
+NUM_NINE	  = #$20	; SPACE = start of number 9 
+
 SPRITE_CHAR_COLOR = #$09 	; multi-colour white
 TREE_CHAR_COLOR   = #$0d	; multi-colour green
 
@@ -79,8 +94,6 @@ TREE_CHAR_COLOR   = #$0d	; multi-colour green
 SECOND_H	  = #$f4	; high byte of $f906
 SECOND_L	  = #$24	; low  byte of $f906
 NUM_SEC		  = #$11	; 1 MORE THAN how many ^ it takes for a single second
-
-SPRITE_START_LSB = #$10 
 
 	processor	6502
 	org		$1001
@@ -118,7 +131,7 @@ start:
 	lda	#01	; white characters
 	sta	CHR_C
 
-	lda	#$20
+	lda	#$00 		; used to be 20 - now 0 because easier comparisons
 	ldx	#$00	
 clear_loop:			; clear the screen
 	sta	SCRN_MEM1,X
@@ -129,14 +142,24 @@ clear_loop:			; clear the screen
 	lda	#255		; custom character set
 	sta	$9005
 
-	;; now, load the sprites into memory
-  	ldx	#0
-load:	lda	sprite,X
-  	sta	CHAR_MEM,X	
-  	inx
-  	cpx	#160
-  	bne	load
+	;; copy the normal BLANK character (20) to the (00) character
+	ldx	#$00
+copy_blank:
+	lda	$1d00,X		; space character
+	sta	$1c00,X
+	inx
+	cpx	#$08
+	bne	copy_blank
 	
+	;; now, load the sprites into memory
+  	ldx	#00
+copy_sprites:
+	lda	sprite,X
+  	sta	SPRITE_ADDRESS,X	
+  	inx
+  	cpx	#176
+  	bne	copy_sprites
+
 	;; copy the numbers from memory
 	;; a.k.a copy starting from $8000 + ($30 * 8) = $8000 + $180 = $8180
 	;; Copy all 10 characters: 10 * 8 = 80 = $50 bytes to copy
@@ -147,45 +170,62 @@ copy_numbers:
 	inx
 	cpx	#$50		; copy characters 0-9
 	bne	copy_numbers
-
+	
 init_all_the_things:	
-	;; store screen and colour memory addresses for calculations later  
+	;; store memory addresses for calculations later  
 	lda 	#$00            ; load LSB
 	sta 	SCRN_LSB
 	sta	SPRITE_LSB
 	sta	CLRM_LSB
 	sta	SPRITE_CLR_LSB
+	lda	#$12		
+	sta	SCORE_LSB
 	lda 	#$1e            ; load MSB
 	sta	SCRN_MSB
 	sta	SPRITE_MSB
-	lda	#$96		; load MSB
+	sta	SCORE_MSB
+	lda	#$96		
 	sta	CLRM_MSB
 	sta	SPRITE_CLR_MSB
 
 	;; init all the other things
 	lda	#$00
 	sta	NUM_WRAPS
+	lda	#$01
+	sta	SPRITE_Y
+	lda	#$0a
+	sta	SPRITE_X
 	lda	#$ff
 	sta	GAME_STATUS
 	
+	;; initialize the timer to 0300
 	ldy	#$0
-	;; initialize the timer
-init_loop:	
+init_timer_loop:	
 	lda	#NUM_ZERO 		; number 0
 	sta	(SCRN_LSB),y		; position
 	lda	#$01			; font color = white
 	sta	(CLRM_LSB),y
 	iny
 	cpy	#$04
-	bne	init_loop
+	bne	init_timer_loop
 
-	ldy	#$03
-	lda	#NUM_ZERO + 9		; number 3
+	ldy	#$01
+	lda	#NUM_ZERO + 3		; number 3
 	sta	(SCRN_LSB),y
-	
 	lda	#NUM_SEC
 	sta	TIMER_CTR
 
+	;; initialize the score
+	ldy	#$12
+init_score_loop:
+	lda	#NUM_ZERO
+	sta	(SCRN_LSB),y
+	lda	#$01		; font color = white
+	sta	(CLRM_LSB),y
+	iny
+	cpy	#$16
+	bne	init_score_loop
+	
 draw_tree:
 	lda	#$e6		; offset tree
 	sta	SPRITE_LSB
@@ -198,7 +238,7 @@ draw_tree:
 	jsr	drawChar
 	
 draw_sprite:
-	lda	#SPRITE_START_LSB		; offset sprite
+	lda	#$20		; offset sprite
 	sta	SPRITE_LSB
 	sta	SPRITE_CLR_LSB
 	
@@ -208,7 +248,19 @@ draw_sprite:
 	sta	CURR_SPRITE
 	jsr	drawChar
 
+place_letter:
+	lda	#$50
+	sta	LETTER_LSB
+	lda	#$1f
+	sta	LETTER_MSB
 
+	lda	#ITEM_LETTER
+	ldy	#$0
+	sta	(LETTER_LSB),y
+	lda	#ITEM_LETTER + 1
+	iny
+	sta	(LETTER_LSB),y
+	
 start_timer:
 	lda	SECOND_L
 	sta	TIMER2_L
@@ -237,14 +289,17 @@ up:
 	jsr	erase
 	ldy 	#22
 	jsr 	subOffset
-	
+	dec	SPRITE_Y
+
 	lda	#CHAR_BCKWARD
 	sta	CURR_SPRITE
+	
 	jmp 	doneInput
 down:	
 	jsr 	erase
 	ldy 	#$16
 	jsr 	addOffset
+	inc	SPRITE_Y	
 	
 	lda	#CHAR_FORWARD
 	sta	CURR_SPRITE
@@ -253,6 +308,7 @@ left:
 	jsr 	erase
 	ldy 	#1
 	jsr 	subOffset
+	dec	SPRITE_X
 
 	lda	#CHAR_LEFT
 	sta	CURR_SPRITE
@@ -261,7 +317,8 @@ right:
 	jsr 	erase
 	ldy 	#1
 	jsr 	addOffset
-
+	inc	SPRITE_X
+	
 	lda	#CHAR_RIGHT
 	sta	CURR_SPRITE
 doneInput:
@@ -276,26 +333,48 @@ end_game:
 	
 ;;; ----- MOVEMENT ROUTINES
 check_movement:
+	;; collision checks
 	ldy	#$00		; top left corner
 	lda	(SPRITE_LSB),y
-	cmp	#$20
-	bne	invalid_movement
+	bne	collision
 	ldy	#$01		; top right corner
 	lda	(SPRITE_LSB),y
-	cmp	#$20
-	bne	invalid_movement
+	bne	collision
 	ldy	#$16		; bottom left corner
 	lda	(SPRITE_LSB),y
-	cmp	#$20
-	bne	invalid_movement
+	bne	collision
 	ldy	#$17		; bottom right corner
 	lda	(SPRITE_LSB),y
-	cmp	#$20
-	bne	invalid_movement
-	;; valid movement
+	bne	collision
+
+	;; boundary checks
+	ldx	SPRITE_X
+	cpx	#$ff		; exceed left
+	beq	invalid_movement
+	cpx	#$15		; exceed right
+	beq	invalid_movement
+	ldy	SPRITE_Y
+	cpy	#$16		; exceed bottom
+	beq	invalid_movement
+	
+	;; no collisions 
 	rts
+collision:
+	cmp	#ITEM_LETTER
+	beq	letter_found
+	cmp	#ITEM_LETTER + 1
+	bne	invalid_movement
+letter_found:	
+	;; found a letter!
+	ldy	#$00
+	lda	(SCORE_LSB),y
+	clc
+	adc	#$01
+	sta	(SCORE_LSB),y
+	rts
+	
 invalid_movement:
-	;; restore previous
+	;; restore previous position
 	lda	PREV_SPRITE_LSB
 	sta	SPRITE_LSB
 	lda	PREV_SPRITE_MSB
@@ -304,6 +383,11 @@ invalid_movement:
 	sta	SPRITE_CLR_LSB
 	lda	PREV_SPRITE_CLR_MSB
 	sta	SPRITE_CLR_MSB
+
+	lda	SPRITE_PREV_X
+	sta	SPRITE_X	
+	lda	SPRITE_PREV_Y
+	sta	SPRITE_Y
 	rts
 	
 save_previous:
@@ -315,6 +399,12 @@ save_previous:
 	sta	PREV_SPRITE_CLR_LSB
 	lda	SPRITE_CLR_MSB
 	sta	PREV_SPRITE_CLR_MSB
+
+	lda	SPRITE_X
+	sta	SPRITE_PREV_X
+	lda	SPRITE_Y
+	sta	SPRITE_PREV_Y
+	
 	rts
 
 ; needs move increment in Y register
@@ -324,7 +414,7 @@ addOffset:
   	clc                     ;2      ; clear the carry
   	adc 	SPRITE_LSB    	;3      ; add to LSB
   	sta 	SPRITE_LSB	;3      ; store result in LSB
-
+	
 	tya			;2
 	clc			;2
 	adc	SPRITE_CLR_LSB	;3
@@ -387,7 +477,7 @@ draw:
 	rts
 
 erase:	
-	ldx	#32     ; load blank
+	ldx	#0     ; load blank
 	ldy	#$00
 	jsr 	draw
 	ldy 	#$01
@@ -554,3 +644,7 @@ tree1:
 	BYTE	26,122,30,122,85,1,1,5
 	BYTE	64,64,144,64,144,164,144,164
 	BYTE	164,169,164,169,85,64,64,80
+
+letter:	
+	BYTE	0,15,11,13,14,15,15,0
+	BYTE	0,240,208,176,112,240,240,0

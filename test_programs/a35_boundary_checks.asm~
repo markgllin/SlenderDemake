@@ -13,8 +13,6 @@ SCRN_V    = $9001	; vertical origin of the screen
 ROWS	  = $9003	; bits 1-6: number of rows (ref: p 175)
 RASTER	  = $9004
 
-NUMBERS_ADDRESS = $1ca0		; where numbers start in custom charset
-
 ;; The IRQ vector is the location (ISR) to jump when an interrupt happens
 IRQ_L        = $0314		; low byte of IRQ vector 
 IRQ_H        = $0315		; high byte of IRQ vector 
@@ -31,7 +29,11 @@ TIMER1_HOL   = $9117		; timer 1 high order latch
 	
 TIMER2_L     = $9118		; timer 2 low order byte
 TIMER2_H     = $9119		; timer 2 high order byte
-	
+
+;;; CUSTOM CHARSET ADDRESSES
+SPACE_ADDRESS   = $1c00   	; where the space character starts
+SPRITE_ADDRESS  = $1c08		; where the sprites start
+NUMBERS_ADDRESS = $1ca8		; where numbers start in custom charset
 	
 ;;; ---- ZERO PAGE
 SCRN_LSB    = $00	; LSB of screen memory address
@@ -47,6 +49,10 @@ NUM_WRAPS   = $0c	; used to figure out end game condition
 	                ; basically, counts the number of times the numbers wrap per decrement 
 	                ; If this reaches 3, then FULL WRAP AROUND so end game 
 GAME_STATUS = $0d	; if this is 0, end game
+
+SCRN_BOUND_X = $0e
+SCRN_BOUND_Y = $0f	
+	
 	
 ;; save the previous position of sprite incase invalid movement 
 PREV_SPRITE_LSB     = $10	
@@ -62,13 +68,14 @@ SPRITE_CLR_MSB   = $1b
 
 	
 ;;; ---- CONSTANTS
-CHAR_FORWARD      = #$00	; character facing forward
-CHAR_BCKWARD      = #$04	; character facing backward
-CHAR_RIGHT        = #$08	; character facing to the right
-CHAR_LEFT         = #$0c	; character facing to the left
-TREE1             = #$10	
-NUM_ZERO	  = #$14	; start of number 0
-NUM_NINE	  = #$1d	; start of number 9 
+SPACE             = #$00
+CHAR_FORWARD      = #$01	; character facing forward
+CHAR_BCKWARD      = #$05	; character facing backward
+CHAR_RIGHT        = #$09	; character facing to the right
+CHAR_LEFT         = #$0d	; character facing to the left
+TREE1             = #$11	; tree sprite
+NUM_ZERO	  = #$15	; start of number 0
+NUM_NINE	  = #$1c	; start of number 9 
 	
 SPRITE_CHAR_COLOR = #$09 	; multi-colour white
 TREE_CHAR_COLOR   = #$0d	; multi-colour green
@@ -79,7 +86,7 @@ TREE_CHAR_COLOR   = #$0d	; multi-colour green
 SECOND_H	  = #$f4	; high byte of $f906
 SECOND_L	  = #$24	; low  byte of $f906
 NUM_SEC		  = #$11	; 1 MORE THAN how many ^ it takes for a single second
-
+	
 SPRITE_START_LSB = #$10 
 
 	processor	6502
@@ -118,7 +125,7 @@ start:
 	lda	#01	; white characters
 	sta	CHR_C
 
-	lda	#$20
+	lda	#$00 		; used to be 20 - now 0 because easier comparisons
 	ldx	#$00	
 clear_loop:			; clear the screen
 	sta	SCRN_MEM1,X
@@ -129,14 +136,24 @@ clear_loop:			; clear the screen
 	lda	#255		; custom character set
 	sta	$9005
 
+	;; copy the normal BLANK character (20) to the (00) character
+	ldx	#$00
+copy_blank:
+	lda	$1d00,X		; space character
+	sta	$1c00,X
+	inx
+	cpx	#$08
+	bne	copy_blank
+	
 	;; now, load the sprites into memory
-  	ldx	#0
-load:	lda	sprite,X
-  	sta	CHAR_MEM,X	
+  	ldx	#00
+copy_sprites:
+	lda	sprite,X
+  	sta	SPRITE_ADDRESS,X	
   	inx
   	cpx	#160
-  	bne	load
-	
+  	bne	copy_sprites
+
 	;; copy the numbers from memory
 	;; a.k.a copy starting from $8000 + ($30 * 8) = $8000 + $180 = $8180
 	;; Copy all 10 characters: 10 * 8 = 80 = $50 bytes to copy
@@ -147,7 +164,7 @@ copy_numbers:
 	inx
 	cpx	#$50		; copy characters 0-9
 	bne	copy_numbers
-
+	
 init_all_the_things:	
 	;; store screen and colour memory addresses for calculations later  
 	lda 	#$00            ; load LSB
@@ -179,13 +196,13 @@ init_loop:
 	cpy	#$04
 	bne	init_loop
 
-	ldy	#$03
+	ldy	#$01
 	lda	#NUM_ZERO + 9		; number 3
 	sta	(SCRN_LSB),y
 	
 	lda	#NUM_SEC
 	sta	TIMER_CTR
-
+	
 draw_tree:
 	lda	#$e6		; offset tree
 	sta	SPRITE_LSB
@@ -276,21 +293,18 @@ end_game:
 	
 ;;; ----- MOVEMENT ROUTINES
 check_movement:
+	;; collision checks
 	ldy	#$00		; top left corner
 	lda	(SPRITE_LSB),y
-	cmp	#$20
 	bne	invalid_movement
 	ldy	#$01		; top right corner
 	lda	(SPRITE_LSB),y
-	cmp	#$20
 	bne	invalid_movement
 	ldy	#$16		; bottom left corner
 	lda	(SPRITE_LSB),y
-	cmp	#$20
 	bne	invalid_movement
 	ldy	#$17		; bottom right corner
 	lda	(SPRITE_LSB),y
-	cmp	#$20
 	bne	invalid_movement
 	;; valid movement
 	rts
@@ -387,7 +401,7 @@ draw:
 	rts
 
 erase:	
-	ldx	#32     ; load blank
+	ldx	#0     ; load blank
 	ldy	#$00
 	jsr 	draw
 	ldy 	#$01
