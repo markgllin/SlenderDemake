@@ -70,9 +70,13 @@ SPRITE_CLR_MSB   = $1b
 
 LETTER_LSB 	 = $1e
 LETTER_MSB	 = $1f
+LETTER_CLR_LSB   = $20
+LETTER_CLR_MSB	 = $21	
 
-SCORE_LSB	 = $20
-SCORE_MSB	 = $21	
+SCORE_LSB	 = $22
+SCORE_MSB	 = $23
+
+LFSR 		 = $24	
 	
 ;;; ---- CONSTANTS
 SPACE             = #$00	; @
@@ -178,16 +182,23 @@ init_all_the_things:
 	sta	SPRITE_LSB
 	sta	CLRM_LSB
 	sta	SPRITE_CLR_LSB
+
 	lda	#$12		
 	sta	SCORE_LSB
+	
 	lda 	#$1e            ; load MSB
 	sta	SCRN_MSB
 	sta	SPRITE_MSB
 	sta	SCORE_MSB
+	lda	#$1f
+	sta	LETTER_MSB
+
 	lda	#$96		
 	sta	CLRM_MSB
 	sta	SPRITE_CLR_MSB
-
+	lda	#$97
+	sta	LETTER_CLR_MSB
+	
 	;; init all the other things
 	lda	#$00
 	sta	NUM_WRAPS
@@ -197,6 +208,8 @@ init_all_the_things:
 	sta	SPRITE_X
 	lda	#$ff
 	sta	GAME_STATUS
+	lda 	#39		; init the SEEEED for RNG
+	sta 	LFSR
 	
 	;; initialize the timer to 0300
 	ldy	#$0
@@ -248,18 +261,7 @@ draw_sprite:
 	sta	CURR_SPRITE
 	jsr	drawChar
 
-place_letter:
-	lda	#$50
-	sta	LETTER_LSB
-	lda	#$1f
-	sta	LETTER_MSB
-
-	lda	#ITEM_LETTER
-	ldy	#$0
-	sta	(LETTER_LSB),y
-	lda	#ITEM_LETTER + 1
-	iny
-	sta	(LETTER_LSB),y
+	jsr 	place_letter
 	
 start_timer:
 	lda	SECOND_L
@@ -366,12 +368,39 @@ collision:
 	bne	invalid_movement
 letter_found:	
 	;; found a letter!
+	;; so update the score
+	ldy	#$01		; second digit from the left
+	lda	(SCORE_LSB),y
+	cmp	#NUM_NINE
+	bne	score_no_wrap
 
-	ldy	#$00
+	;; score wraps, so do that
+	lda	#NUM_ZERO
+	sta	(SCORE_LSB),y
+	
+	dey
 	lda	(SCORE_LSB),y
 	clc
 	adc	#$01
 	sta	(SCORE_LSB),y
+	jmp	done_score
+	
+score_no_wrap:
+	clc
+	adc	#$01
+	sta	(SCORE_LSB),y
+
+done_score:	
+	;; and erase the letter
+	lda	#$00
+	ldy	#$00
+	sta	(LETTER_LSB),y
+	iny
+	sta	(LETTER_LSB),y
+
+	;; new letter!
+	jsr	place_letter
+	
 	rts
 	
 invalid_movement:
@@ -454,6 +483,27 @@ subOffset_no_borrow:	; total without borrow: 30
 	
 ;;; ----- DRAWING ROUTINES
 
+place_letter:
+	lda	LFSR
+	jsr	random
+
+	sta	LETTER_LSB
+	sta	LETTER_CLR_LSB	
+
+	ldy	#$0
+	lda	#ITEM_LETTER
+	sta	(LETTER_LSB),y
+	lda	#$01
+	sta	(LETTER_CLR_LSB),y
+
+	iny
+	lda	#ITEM_LETTER + 1
+	sta	(LETTER_LSB),y
+	lda	#$01
+	sta	(LETTER_CLR_LSB),y
+	
+	rts
+	
 drawChar:
 	ldx	CURR_SPRITE
 	ldy	#$00    ; draw 1st char
@@ -489,7 +539,7 @@ erase:
 	jsr 	draw
 	rts
 	
-;;; ---- SUBROUTINES
+;;; ---- FRAME SUBROUTINES
 
 startFrame:	
 	lda	#$00
@@ -503,6 +553,27 @@ frame:
 	bne	frame
 	rts
 
+;;; ---- RANDOM NUMERS
+random:	
+	ldy	LFSR
+	lsr 	LFSR                    ; 00010011 1  = 19
+	lsr 	LFSR                    ; 00001001 1  = 9
+	eor 	LFSR    ; 6th tap   ; 00101110 1  = 46
+	lsr 	LFSR                    ; 00010111 1
+	eor 	LFSR    ; 5th tap   ; 00110000 1
+	lsr 	LFSR                    ; 00011000 0
+	eor 	LFSR    ; 4th tap   ; 00111111 0
+	and 	#1                  ; 00000001 0
+	sty 	LFSR
+	lsr 	LFSR
+	clc
+	ror
+	ror                      ; 10000000 1
+	ora 	LFSR                 ; 10010011 1
+	sta 	LFSR
+	rts
+
+	
 ;;; ---- INTERRUPTS
 
 isr_update_timer:
