@@ -21,7 +21,6 @@ end
   ldx #0
 loop
   jsr startFrame
-  lda LFSR
   jsr random
   sta 7680,x
   inx
@@ -37,6 +36,7 @@ done
 ;  0010011 1
 ;     0010 0111
 random
+  lda LFSR
   ldy LFSR
   lsr LFSR                    ; 00010011 1  = 19
   lsr LFSR                    ; 00001001 1  = 9
