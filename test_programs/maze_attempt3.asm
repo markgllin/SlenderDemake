@@ -59,6 +59,9 @@ end
   lda #$1e ;#MAZE_MSB              ; load MSB
   sta $1
 
+  lda #94       ; special symbol for maze origin
+  sta $1e2e
+
   lda #240
   sta LFSR
 
@@ -70,7 +73,6 @@ generateMaze
   jsr random
   jsr rndDirection
   sta DIR
-  sta 8164
 
   jsr isCellValid
   bcs validCell
@@ -94,6 +96,9 @@ invalidCell
 backtrack
   ldy #0              
   lda ($0),y          ; load value of current cell into accumulator
+
+  cmp #94
+  beq done
 
   TAX
 
@@ -143,6 +148,9 @@ goWest
   lda #(X_OFFSET * 4)
   jsr subOffset
   jmp generateMaze
+
+done
+  jmp done
 
 validCell
   lda DIR
