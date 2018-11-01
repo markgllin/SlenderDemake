@@ -91,8 +91,58 @@ invalidCell
   jsr isCellValid
   bcs generateMaze
 
-loop
-  jmp loop
+backtrack
+  ldy #0              
+  lda ($0),y          ; load value of current cell into accumulator
+
+  TAX
+
+  lda #102
+  sta ($0),y
+
+  TXA
+  cmp #NORTH
+  beq goSouth
+  cmp #SOUTH
+  beq goNorth
+  cmp #EAST
+  beq goWest
+goEast
+  lda X_COORD
+  clc
+  adc #4
+  sta X_COORD
+
+  lda #(X_OFFSET * 4)
+  jsr addOffset
+  jmp generateMaze
+goSouth
+  lda Y_COORD
+  clc
+  adc #4
+  sta Y_COORD
+
+  lda #(Y_OFFSET * 4)
+  jsr addOffset
+  jmp generateMaze
+goNorth
+  lda Y_COORD
+  sec
+  sbc #4
+  sta Y_COORD
+
+  lda #(Y_OFFSET * 4)
+  jsr subOffset
+  jmp generateMaze
+goWest
+  lda X_COORD
+  sec
+  sbc #4
+  sta X_COORD
+
+  lda #(X_OFFSET * 4)
+  jsr subOffset
+  jmp generateMaze
 
 validCell
   lda DIR
