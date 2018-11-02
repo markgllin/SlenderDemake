@@ -20,8 +20,8 @@ MAZE_LSB = $00
 MAZE_MSB = $1e
 
 LFSR = $3
-X_COORD = $10
-Y_COORD = $11
+MAZE_X_COORD = $10
+MAZE_Y_COORD = $11
 DIR = $4
 FRAME = $fb
 
@@ -29,8 +29,27 @@ FRAME = $fb
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
   mac chk_scrn_bndry
-  tax
-  cpx [{1}]
+  cmp [{1}]
+  endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; loads coordinate into [{1}] and adds [{2}]
+; result stored in accumulator
+  mac inc_maze_coord
+  lda [{1}]
+  clc
+  adc [{2}]
+  endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; loads coordinate into [{1}] and subtracts [{2}]
+; result stored in accumulator
+  mac dec_maze_coord
+  lda [{1}]
+  sec
+  sbc [{2}]
   endm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -47,9 +66,9 @@ end
   jsr clr
 
   lda #2
-  sta X_COORD                ; x-coord
+  sta MAZE_X_COORD                ; x-coord
   lda #2
-  sta Y_COORD                ; y-coord
+  sta MAZE_Y_COORD                ; y-coord
 
   sta $1e2e
 
@@ -64,13 +83,9 @@ end
 
   lda #240
   sta LFSR
-
 generateMaze
-  lda X_COORD
-  lda Y_COORD
   jsr startFrame
 
-  jsr random
   jsr rndDirection
   sta DIR
 
@@ -92,7 +107,6 @@ invalidCell
   lda #WEST
   jsr isCellValid
   bcs generateMaze
-
 backtrack
   ldy #0              
   lda ($0),y          ; load value of current cell into accumulator
@@ -102,8 +116,7 @@ backtrack
 
   TAX
 
-  lda #102
-  sta ($0),y
+  jsr drawPath
 
   TXA
   cmp #NORTH
@@ -113,44 +126,40 @@ backtrack
   cmp #EAST
   beq goWest
 goEast
-  lda X_COORD
-  clc
-  adc #4
-  sta X_COORD
+  inc_maze_coord MAZE_X_COORD, #4
+  sta MAZE_X_COORD
 
   lda #(X_OFFSET * 4)
   jsr addOffset
   jmp generateMaze
 goSouth
-  lda Y_COORD
-  clc
-  adc #4
-  sta Y_COORD
+  inc_maze_coord MAZE_Y_COORD, #4
+  sta MAZE_Y_COORD
 
   lda #(Y_OFFSET * 4)
   jsr addOffset
   jmp generateMaze
 goNorth
-  lda Y_COORD
-  sec
-  sbc #4
-  sta Y_COORD
+  dec_maze_coord MAZE_Y_COORD, #4
+  sta MAZE_Y_COORD
 
   lda #(Y_OFFSET * 4)
   jsr subOffset
   jmp generateMaze
 goWest
-  lda X_COORD
-  sec
-  sbc #4
-  sta X_COORD
+  dec_maze_coord MAZE_X_COORD, #4
+  sta MAZE_X_COORD
 
   lda #(X_OFFSET * 4)
   jsr subOffset
   jmp generateMaze
 
 done
-  jmp done
+  jsr drawPath
+  jmp loop
+
+loop
+  jmp loop
 
 validCell
   lda DIR
@@ -161,11 +170,8 @@ validCell
   cmp #EAST
   beq updateEastCell
 updateWestCell
-  lda X_COORD
-  lda X_COORD
-  sec
-  sbc #4
-  sta X_COORD
+  dec_maze_coord MAZE_X_COORD, #4
+  sta MAZE_X_COORD
 
   lda #(X_OFFSET * 4)
   jsr subOffset
@@ -174,10 +180,8 @@ updateWestCell
   jsr draw
   jmp generateMaze
 updateNorthCell
-  lda Y_COORD
-  sec
-  sbc #4
-  sta Y_COORD
+  dec_maze_coord MAZE_Y_COORD, #4
+  sta MAZE_Y_COORD
 
   lda #(Y_OFFSET * 4)
   jsr subOffset
@@ -186,10 +190,8 @@ updateNorthCell
   jsr draw
   jmp generateMaze
 updateSouthCell
-  lda #4
-  clc
-  adc Y_COORD
-  sta Y_COORD
+  inc_maze_coord MAZE_Y_COORD, #4
+  sta MAZE_Y_COORD
 
   lda #(Y_OFFSET * 4)
   jsr addOffset
@@ -198,10 +200,8 @@ updateSouthCell
   jsr draw
   jmp generateMaze
 updateEastCell
-  lda #4
-  clc
-  adc X_COORD
-  sta X_COORD
+  inc_maze_coord MAZE_X_COORD, #4
+  sta MAZE_X_COORD
 
   lda #(X_OFFSET * 4)
   jsr addOffset
@@ -227,10 +227,7 @@ isCellValid
   cmp #EAST
   beq checkEastCell
 checkWestCell
-  lda X_COORD
-  sec
-  sbc #4
-
+  dec_maze_coord MAZE_X_COORD, #4
   chk_scrn_bndry #LFT_SCRN_BNDRY
   bmi invalidCellValue
 
@@ -245,9 +242,7 @@ checkWestCell
   jsr addOffset
   jmp checkCellValue
 checkEastCell
-  lda X_COORD
-  clc
-  adc #4
+  inc_maze_coord MAZE_X_COORD, #4
   chk_scrn_bndry #RGHT_SCRN_BNDRY
   beq contEast
   bcs invalidCellValue
@@ -264,9 +259,7 @@ contEast
   jsr subOffset
   jmp checkCellValue
 checkNorthCell
-  lda Y_COORD
-  sec
-  sbc #4
+  dec_maze_coord MAZE_Y_COORD, #4
   chk_scrn_bndry #TOP_SCRN_BNDRY
   bmi invalidCellValue
 
@@ -281,9 +274,7 @@ checkNorthCell
   jsr addOffset
   jmp checkCellValue
 checkSouthCell
-  lda Y_COORD
-  clc
-  adc #4
+  inc_maze_coord MAZE_Y_COORD, #4
   chk_scrn_bndry #BTM_SCRN_BNDRY
   beq contSouth
   bcs invalidCellValue
@@ -311,12 +302,13 @@ invalidCellValue
 ; need to direction in accumulator
 ; returns direction in accumulator
 rndDirection
+  jsr random
   and #3
   rts
 
-; need to load seed in accumulator before jumping
 ; random value returned in accumulator
 random
+  lda LFSR
   ldy LFSR
   lsr LFSR                ; 00010011 1  = 19
   lsr LFSR                ; 00001001 1  = 9
@@ -365,15 +357,13 @@ subOffset
   sec              ;2     ; set carry
   sbc $0           ;3     ; sub from LSB
   sta $0           ;3     ; store result in LSB
-
   lda $1           ;3
   sbc #0           ;2     ; add carry to MSB
   sta $1           ;3     ; store MSB
   rts
 
+; needs character to draw in accumulator
 draw
-  ;lda #0                ; load @
-load
   ldy #0                ; looks pointless to load 0
   sta ($0),y            ; BUT IT NEEEDS IT
   rts
@@ -387,6 +377,22 @@ frame
 	bne frame
 	inc	FRAME		; increase frame counter
 	lda	FRAME
-	cmp	#$99		; add delay
+	cmp	#$20		; add delay
 	bne	frame
+  rts
+
+drawPath
+  ldy #0
+  lda #102
+  sta ($0),y
+  iny
+  sta ($0),y
+  TYA
+  CLC
+  adc #21
+  TAY
+  lda #102
+  sta ($0),y
+  iny
+  sta ($0),y
   rts
