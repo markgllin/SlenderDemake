@@ -1,119 +1,64 @@
-; pg179 for character keys
-; pg270 screen memory maps
-; dont look at my garbage code - just accept it
-CHROUT = $ffd2
+CLEAR_CHAR          = 32
+MAZE_X_COORD        = $10
+MAZE_Y_COORD        = $11
+MAZE_LSB            = $0
+MAZE_MSB            = $1
+MAZE_ORIGIN         = 94
+MAZE_DIR            = $2
+
+X_OFFSET            = 1
+Y_OFFSET            = 22
+
+LFT_SCRN_BNDRY      = 0
+RGHT_SCRN_BNDRY     = 21
+TOP_SCRN_BNDRY      = 0
+BTM_SCRN_BNDRY      = 21
+
+SEED                = #240   ; can be anything but 0
+LFSR                = $3
+OFFSET              = $4
+LSB          = $5
+MSB          = $6
+
+NORTH               = 0   ;@
+SOUTH               = 1   ;A
+EAST                = 2   ;B
+WEST                = 3   ;C
+
 FRAME = $fb
-X_COORD = $10
-Y_COORD = $11
-NORTH = 1   ;A
-SOUTH = 2   ;B
-EAST = 4    ;D
-WEST = 8    ;H
-CLOCK = $FFDE
-LSB = $0
-MSB = $1
-TEMP = $2
-X_OFFSET = 1
-Y_OFFSET = 22
-CLEAR_CHAR = 0
-LEFT_SCREEN_BOUNDARY = 0
-RIGHT_SCREEN_BOUNDARY = 21
-TOP_SCREEN_BOUNDARY = 0
-BOTTOM_SCREEN_BOUNDARY = 22
-W_KEY = 9
 
-
-	processor 6502
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  mac checkScreenBoundary
-  ldx [{1}]
-  cpx [{2}]
-  endm
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  mac peekCell
-  ldy #0
-  lda (LSB),y
-  endm
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;   mac checkNorthVisit
-;   lda #22
-;   jsr subOffset
-
-;   peekCell
-;   ora TEMP
-;   sta TEMP
-  
-;   lda #22
-;   jsr addOffset
-;   endm
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;   mac checkSouthVisit
-;   lda #22
-;   jsr addOffset
-
-;   peekCell
-;   ora TEMP
-;   sta TEMP
-  
-;   lda #22
-;   jsr subOffset
-;   endm
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;   mac checkEastVisit
-;   lda #1
-;   jsr addOffset
-
-;   peekCell
-;   ora TEMP
-;   sta TEMP
-  
-;   lda #1
-;   jsr subOffset
-;   endm
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;   mac checkWestVisit
-;   lda #1
-;   jsr subOffset
-
-;   peekCell
-;   ora TEMP
-;   sta TEMP
-
-;   lda #1
-;   jsr addOffset
-;   endm
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;   mac isSurroundingVisited
-;   lda #0
-;   sta TEMP
-;   checkEastVisit
-;   checkWestVisit
-;   checkNorthVisit
-;   checkSouthVisit
-;   endm
-; ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  mac goDirection
+; loads coordinate into [{1}] and adds [{2}]
+; result stored in accumulator
+  mac inc_maze_coord
   lda [{1}]
+  clc
+  adc [{2}]
+  endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; loads coordinate into [{1}] and subtracts [{2}]
+; result stored in accumulator
+  mac dec_maze_coord
+  lda [{1}]
+  sec
+  sbc [{2}]
+  endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; loads coordinate into [{1}] and subtracts [{2}]
+; result stored in accumulator
+  mac load_maze_offsets
+  lda [{1}]
+  sta OFFSET
+  lda MAZE_LSB
+  ldx MAZE_MSB
   jsr [{2}]
   endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-  mac goWest
-  goDirection #X_OFFSET, subOffset
-  endm
-
-  mac goEast
-  goDirection #X_OFFSET, addOffset
-  endm
-
-  mac goNorth
-  goDirection #Y_OFFSET, subOffset
-  endm
-
-  mac goSouth
-  goDirection #Y_OFFSET, addOffset
-  endm
-
+  processor 6502
   org $1001
   DC.W end
   DC.W 1234
@@ -124,353 +69,256 @@ end
   ldx #12								; ugly background
 	stx 36879
 
-  jsr clr               ; clear screen
+  jsr clr
 
-  lda #$00              ; load LSB
-  sta $0
+  lda #2                ; need to randomize this some how
+  sta MAZE_X_COORD
+  sta MAZE_Y_COORD
 
-  sta X_COORD                ; x-coord
-  sta Y_COORD                ; y-coord
+  lda #$2e         ; load LSB
+  sta MAZE_LSB
 
-  lda #$1e              ; load MSB
-  sta $1
+  lda #$1e         ; load MSB
+  sta MAZE_MSB
 
+  lda #MAZE_ORIGIN
+  sta $1e2e
 
-input
+  lda #SEED
+  sta LFSR
+
+beginMaze
   jsr startFrame
-  lda $c5   ; current key pressed (pg 172)
-  cmp #W_KEY      ;w
-  beq up
-  cmp #17     ;a
-  beq left    
-  cmp #41     ;s
-  beq down
-  cmp #18     ;d
-  beq right
-  jmp input
-up
+
+  jsr random
+  and #3
+  sta MAZE_DIR
+
+  jsr isCellValid
+  bcs validCell
+invalidCell
   lda #NORTH
   jsr isCellValid
-  bcc input
+  bcs beginMaze
 
-  dex
-  stx Y_COORD
-
-  goNorth
-  lda #NORTH
-  jsr draw
-  jmp input
-down
   lda #SOUTH
   jsr isCellValid
-  bcc input
+  bcs beginMaze
 
-  inx
-  stx Y_COORD
-
-  goSouth
-  lda #SOUTH
-  jsr draw
-  jmp input
-left
-  lda #WEST
-  jsr isCellValid
-  bcc input
-  dex
-  stx $10
-
-  goWest
-  lda #WEST
-  jsr draw
-  jmp input
-right
   lda #EAST
   jsr isCellValid
-  bcc input
+  bcs beginMaze
 
-  inx
-  stx $10 
-
-  goEast
-  lda #EAST
-  jsr draw
-  jmp input
-
-
-; loop
-;   jsr chooseRandomDirection
-;   sta 7680
-;   jmp loop
-
-; choose random dir (not the way it came)
-; check if direction is valid
-;   direction is valid if:
-;     - not yet visited / not a blank
-;     - not beyond screen
-;     - no visited nodes in at least 3 directions (not including blanks)
-;   if valid:
-;     - push onto stack/screen (marking it visited)
-;     - update stack pointer
-;     - jmp choose random dir
-;   if not valid:
-;     - check if any surrounding valid blocks
-;       if yes:
-;         choose random dir again
-;       if no:
-;         pop off stack (set current tile blank)
-;         move back down stack (step back to previous tile)
-;         choose random dir again
-
-; this is not random but will use for now
-chooseRandomDirection
-  ;choose random dir
-  jsr CLOCK           ; random value stored in accumulator
-  cmp #192
-  bcs north
-  cmp #128
-  bcs south
-  cmp #64
-  bcs east
-west
   lda #WEST
-  rts
-north
-  lda #NORTH
-  rts
-south
-  lda #SOUTH
-  rts
-east
-  lda #EAST
-  rts
+  jsr isCellValid
+  bcs beginMaze
 
+  jsr backtrack
+  bcc beginMaze
+  jmp doneMaze
 
-; needs direction in accumulator
-isInScreenBoundary
-  cmp #NORTH
-  beq checkNorth
+validCell
+  lda MAZE_DIR
+  beq updateNorthCell
   cmp #SOUTH
-  beq checkSouth
+  beq updateSouthCell
   cmp #EAST
-  beq checkEast
-checkWest
-  checkScreenBoundary X_COORD, #LEFT_SCREEN_BOUNDARY
-  beq invalidScreenBoundary
-  jmp validScreenBoundary
-checkNorth
-  checkScreenBoundary Y_COORD, #TOP_SCREEN_BOUNDARY
-  beq invalidScreenBoundary
-  jmp validScreenBoundary
-checkSouth
-  checkScreenBoundary Y_COORD, #BOTTOM_SCREEN_BOUNDARY
-  beq invalidScreenBoundary
-  jmp validScreenBoundary
-checkEast
-  checkScreenBoundary X_COORD, #RIGHT_SCREEN_BOUNDARY
-  beq invalidScreenBoundary
-validScreenBoundary
-  sec
-  rts
-invalidScreenBoundary
-  clc
-  rts
+  beq updateEastCell
+updateWestCell
+  dec_maze_coord MAZE_X_COORD, #4
+  sta MAZE_X_COORD
 
-; needs direction in accumulator
-isVisitedCell
-  cmp #NORTH
-  beq loadNorthOffset
-  cmp #SOUTH
-  beq loadSouthOffset
-  cmp #EAST
-  beq loadEastOffset
-loadWestOffset
-  goWest
+  load_maze_offsets #(X_OFFSET * 4), subOffset
+  ldx #WEST
+  jmp updateCell
 
-  peekCell
-  TAY
+updateNorthCell
+  dec_maze_coord MAZE_Y_COORD, #4
+  sta MAZE_Y_COORD
 
-  goEast
-
-  cpy #CLEAR_CHAR
-  bne invalidVisited
-  jmp validUnvisited
-loadNorthOffset
-  goNorth
-
-  peekCell
-  TAY
-
-  goSouth
-
-  cpy #CLEAR_CHAR
-  bne invalidVisited
-  jmp validUnvisited
-loadSouthOffset
-  goSouth
-
-  peekCell
-  TAY
+  load_maze_offsets #(Y_OFFSET * 4), subOffset
   
-  goNorth
+  ldx #NORTH
+  jmp updateCell
 
-  cpy #CLEAR_CHAR
-  bne invalidVisited
-  jmp validUnvisited
-loadEastOffset
-  goEast
+updateSouthCell
+  inc_maze_coord MAZE_Y_COORD, #4
+  sta MAZE_Y_COORD
 
-  peekCell
-  TAY
+  load_maze_offsets #(Y_OFFSET * 4), addOffset
 
-  goWest
+  ldx #SOUTH
+  jmp updateCell
+updateEastCell
+  inc_maze_coord MAZE_X_COORD, #4
+  sta MAZE_X_COORD
 
-  cpy #CLEAR_CHAR
-  bne invalidVisited
-validUnvisited
-  sec
-  rts
-invalidVisited
-  clc
-  rts
+  load_maze_offsets #(X_OFFSET * 4), addOffset
 
+  ldx #EAST
+updateCell
+  sta MAZE_MSB
+  lda LSB
+  sta MAZE_LSB
+  TXA
+  jsr draw
+  jmp beginMaze
 
-; needs direction to be pass in by accumulator
-; affects A, X, Y registers
-isCellValid
-  sta TEMP
-  jsr isInScreenBoundary
-  bcc notValid
-
-  lda TEMP
-  jsr isVisitedCell
-  bcc notValid
-
-  ; lda TEMP
-  ; jsr areSurroundingCellsVisited
-  ; bcc notValid
-isValid
-  sec
-  rts
-notValid
-  clc
-  rts
-
-areSurroundingCellsVisited
-; no visited nodes in the 3 directions (not including blanks)
-  cmp #NORTH
-  beq setNorthOffset
-  cmp #SOUTH
-  beq setSouthOffset
-  cmp #EAST
-  beq setEastOffset
-setWestOffset
-  goWest
-  jsr countSurroundingCells
-  goEast
-  jmp checkVisited
-setNorthOffset
-  goNorth
-  jsr countSurroundingCells
-  goSouth
-  jmp checkVisited
-setSouthOffset
-  goSouth
-  jsr countSurroundingCells
-  goNorth
-  jmp checkVisited
-setEastOffset
-  goEast
-  jsr countSurroundingCells
-  goWest
-checkVisited
-  ldy TEMP
-  cpy #1
-  bmi invalidSurroundingCells
-validSurroundingCells
-  sec
-  rts
-invalidSurroundingCells
-  clc
-  rts
+doneMaze
+  jsr drawPath
+  jmp doneMaze
 
 
-countSurroundingCells
+backtrack
   ldy #0
-  sty TEMP
-checkLeft
-  checkScreenBoundary #X_COORD, #LEFT_SCREEN_BOUNDARY ; check if surrounding cell is on screen edge
-  bcs incrementLeft      ; branch to incrementLeft if on scrn boundary
-  lda #WEST
-  jsr isVisitedCell
-  bcc checkRight         ; branch if valid cell
-incrementLeft
-  inc TEMP
-checkRight
-  checkScreenBoundary #X_COORD, #RIGHT_SCREEN_BOUNDARY
-  bcs incrementRight      ; branch to incrementLeft if on scrn boundary
-  lda #EAST
-  jsr isVisitedCell
-  bcc checkTop
-incrementRight
-  inc TEMP
-checkTop
-  checkScreenBoundary #Y_COORD, #TOP_SCREEN_BOUNDARY
-  bcs incrementTop      ; branch to incrementLeft if on scrn boundary
-  lda #NORTH
-  jsr isVisitedCell
-  bcc checkTop
-incrementTop
-  inc TEMP
-checkBottom
-  checkScreenBoundary #Y_COORD, #BOTTOM_SCREEN_BOUNDARY
-  bcs incrementBottom      ; branch to incrementLeft if on scrn boundary
-  lda #SOUTH
-  jsr isVisitedCell
-  bcc doneCount
-incrementBottom
-  inc TEMP
-doneCount
+  lda (MAZE_LSB),y
+
+  cmp #MAZE_ORIGIN
+  beq atOrigin
+
+  TAX
+  jsr drawPath
+  TXA
+
+  cmp #NORTH
+  beq bkTrackSouth
+  cmp #SOUTH
+  beq bkTrackNorth
+  cmp #EAST
+  beq bkTrackWest
+bkTrackEast
+  inc_maze_coord MAZE_X_COORD, #4
+  sta MAZE_X_COORD
+  load_maze_offsets #(X_OFFSET * 4), addOffset
+  jmp updateMazeAddr
+bkTrackSouth
+  inc_maze_coord MAZE_Y_COORD, #4
+  sta MAZE_Y_COORD
+
+  load_maze_offsets #(Y_OFFSET * 4), addOffset
+  jmp updateMazeAddr
+bkTrackNorth
+  dec_maze_coord MAZE_Y_COORD, #4
+  sta MAZE_Y_COORD
+
+  load_maze_offsets #(Y_OFFSET * 4), subOffset
+  jmp updateMazeAddr
+bkTrackWest
+  dec_maze_coord MAZE_X_COORD, #4
+  sta MAZE_X_COORD
+
+  load_maze_offsets #(X_OFFSET * 4), subOffset
+  jsr subOffset
+updateMazeAddr
+  sta MAZE_MSB
+  lda LSB
+  sta MAZE_LSB
+  clc
+  rts
+atOrigin
+  sec
   rts
 
-pushScreen
-  ; mark visited by setting direction
-  ; update current stack pointer + coord
-  ; jmp to choose another random dir
+isCellValid
+  beq checkNorthCell
+  cmp #SOUTH
+  beq checkSouthCell
+  cmp #EAST
+  beq checkEastCell
 
-popScreen
-  ; set current tile blank
-  ; move back down stack (step back to previous tile)
-  ; jmp to choose another random dir
+checkWestCell
+  dec_maze_coord MAZE_X_COORD, #4
+  bmi invalidCellValue
 
+  load_maze_offsets #(X_OFFSET * 4), subOffset
 
+  ldy #0
+  lda (LSB),y
+  jmp checkCellValue
 
-  ; print to screen
-  ; move to new tile
+checkNorthCell
+  dec_maze_coord MAZE_Y_COORD, #4
+  bmi invalidCellValue
 
+  load_maze_offsets #(Y_OFFSET * 4), subOffset
 
-; needs move increment in accumulator
+  ldy #0
+  lda (LSB),y
+  jmp checkCellValue
+
+checkSouthCell
+  inc_maze_coord MAZE_Y_COORD, #4
+  cmp #BTM_SCRN_BNDRY
+  beq contSouth
+  bcs invalidCellValue
+contSouth
+  load_maze_offsets #(Y_OFFSET * 4), addOffset
+
+  ldy #0
+  lda (LSB),y
+  jmp checkCellValue
+
+checkEastCell
+  inc_maze_coord MAZE_X_COORD, #4
+  cmp #RGHT_SCRN_BNDRY
+  beq contEast
+  bcs invalidCellValue
+contEast
+  load_maze_offsets #(X_OFFSET * 4), addOffset
+
+  ldy #0
+  lda (LSB),y
+checkCellValue
+  cmp #CLEAR_CHAR
+  bne invalidCellValue
+validCellValue
+  sec
+  rts
+invalidCellValue
+  clc
+  rts
+
+drawPath
+  ldy #0
+  lda #102
+  sta (MAZE_LSB),y
+  iny
+  sta (MAZE_LSB),y
+  TYA
+  CLC
+  adc #21
+  TAY
+  lda #102
+  sta (MAZE_LSB),y
+  iny
+  sta (MAZE_LSB),y
+  rts
+
+; needs LSB in accumulator and MSB in X
+; needs offset in OFFSET
+; returns values in OFFSET, LSB, AND MSB
+; also returns MSB accumulator
 addOffset
-  clc             ;2      ; clear the carry
-  adc $0          ;3      ; add to LSB
-  sta $0          ;3      ; store result in LSB
-  lda #0          ;2
-  adc $1          ;3      ; add carry to MSB
-  sta $1          ;3      ; store MSB
+  clc                             ; clear the carry
+  adc OFFSET                ; add to LSB
+  sta LSB                ; store result in LSB
+  TXA          
+  adc #0            ; add carry to MSB
+  sta MSB            ; store MSB
   rts 
 
+; needs LSB in accumulator and MSB in X
+; needs offset in OFFSET
+; returns values in OFFSET, LSB, AND MSB
+; also returns MSB accumulator
 subOffset
-  ldx $0
-  sta $0           ; store offset into address (because large # - offset instead of offset - large #)
-  TXA           ;3     ; load address into accumulator
-  sec              ;2     ; set carry
-  sbc $0           ;3     ; sub from LSB
-  sta $0           ;3     ; store result in LSB
-
-  lda $1           ;3
-  sbc #0           ;2     ; add carry to MSB
-  sta $1           ;3     ; store MSB
+  sec
+  sbc OFFSET
+  sta LSB
+  TXA
+  sbc #0
+  sta MSB
   rts
-
 
 clr
 	lda	#CLEAR_CHAR
@@ -482,6 +330,34 @@ clrloop:
 	bne	clrloop
   rts
 
+; random value returned in accumulator
+; alters Y register
+random
+  lda LFSR
+  ldy LFSR
+  lsr LFSR              
+  lsr LFSR              
+  eor LFSR    ; 6th tap 
+  lsr LFSR             
+  eor LFSR    ; 5th tap
+  lsr LFSR             
+  eor LFSR    ; 4th tap
+  and #1               
+  sty LFSR
+  lsr LFSR
+  clc
+  ror
+  ror                  
+  ora LFSR             
+  sta LFSR
+  rts
+
+  ; needs character to draw in accumulator
+draw
+  ldy #0                ; looks pointless to load 0
+  sta (MAZE_LSB),y            ; BUT IT NEEEDS IT
+  rts
+
 startFrame	
   lda	#$00
 	sta	FRAME	
@@ -491,13 +367,6 @@ frame
 	bne frame
 	inc	FRAME		; increase frame counter
 	lda	FRAME
-	cmp	#$10		; add delay
+	cmp	#$20		; add delay
 	bne	frame
-  rts
-
-draw
-  ;lda #0                ; load @
-load
-  ldy #0                ; looks pointless to load 0
-  sta ($0),y            ; BUT IT NEEEDS IT
   rts
