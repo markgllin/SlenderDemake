@@ -67,43 +67,51 @@ validCell
   cmp #SOUTH
   beq updateSouthCell
   cmp #EAST
-  beq updateEastCell
+  beq updateEast
 updateWestCell
   dec_maze_coord MAZE_X_COORD, #4
   sta MAZE_X_COORD
-
-  load_maze_offsets #(X_OFFSET * 4), subOffset
+  load_maze_offsets #(X_OFFSET * 2), subOffset
+  store_maze_offsets
+  ;ldx #WEST
+  jsr drawPath
+  load_maze_offsets #(X_OFFSET * 2), subOffset
   ldx #WEST
   jmp updateCell
-
 updateNorthCell
   dec_maze_coord MAZE_Y_COORD, #4
   sta MAZE_Y_COORD
-
-  load_maze_offsets #(Y_OFFSET * 4), subOffset
-  
+  load_maze_offsets #(Y_OFFSET * 2), subOffset
+  store_maze_offsets
+  ;ldx #NORTH
+  jsr drawPath
+  load_maze_offsets #(Y_OFFSET * 2), subOffset
   ldx #NORTH
   jmp updateCell
-
+updateEast
+  jmp updateEastCell
 updateSouthCell
   inc_maze_coord MAZE_Y_COORD, #4
   sta MAZE_Y_COORD
-
-  load_maze_offsets #(Y_OFFSET * 4), addOffset
-
+  load_maze_offsets #(Y_OFFSET * 2), addOffset
+  store_maze_offsets
+  ;ldx #SOUTH
+  jsr drawPath
+  load_maze_offsets #(Y_OFFSET * 2), addOffset
   ldx #SOUTH
   jmp updateCell
 updateEastCell
   inc_maze_coord MAZE_X_COORD, #4
   sta MAZE_X_COORD
 
-  load_maze_offsets #(X_OFFSET * 4), addOffset
-
+  load_maze_offsets #(X_OFFSET * 2), addOffset
+  store_maze_offsets
+  ;ldx #EAST
+  jsr drawPath
+  load_maze_offsets #(X_OFFSET * 2), addOffset
   ldx #EAST
 updateCell
-  sta MAZE_MSB
-  lda LSB
-  sta MAZE_LSB
+  store_maze_offsets
   TXA
   jsr draw
   jmp beginMaze
