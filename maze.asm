@@ -1,21 +1,6 @@
-  processor 6502
-
-  include "constants.asm"
-  include "macros.asm"
-
-  org $1001
-  DC.W end
-  DC.W 1234
-  DC.B $9e, " 4110", 0
-end
-  dc.w 0
-
-  ldx #12								; ugly background
-	stx 36879
-
-  jsr clr
-
-  lda #2                ; need to randomize this some how
+; maze setup
+generateMaze subroutine
+  lda #2           ; need to randomize this some how
   sta MAZE_X_COORD
   sta MAZE_Y_COORD
 
@@ -28,52 +13,41 @@ end
   lda #MAZE_ORIGIN
   sta $1e2e
 
-  lda #SEED
-  sta LFSR
-
-  jsr beginMaze
-
-; can remove. this is just to check if it's done
-loop
-  sta 7680
-  jmp loop
-
-
-beginMaze
+.carveMaze
   jsr random
   and #3
   sta MAZE_DIR
 
   jsr isCellValid
-  bcs validCell
-invalidCell
+  bcs .validCell
+.invalidCell
   lda #NORTH
   jsr isCellValid
-  bcs beginMaze
+  bcs .carveMaze
 
   lda #SOUTH
   jsr isCellValid
-  bcs beginMaze
+  bcs .carveMaze
 
   lda #EAST
   jsr isCellValid
-  bcs beginMaze
+  bcs .carveMaze
 
   lda #WEST
   jsr isCellValid
-  bcs beginMaze
+  bcs .carveMaze
 
   jsr backtrack
-  bcc beginMaze
+  bcc .carveMaze
   jmp doneMaze
-validCell
+.validCell
   lda MAZE_DIR
-  beq updateNorthCell
+  beq .updateNorthCell
   cmp #SOUTH
-  beq updateSouthCell
+  beq .updateSouthCell
   cmp #EAST
-  beq updateEast
-updateWestCell
+  beq .updateEast
+.updateWestCell
   dec_maze_coord MAZE_X_COORD, #4
   sta MAZE_X_COORD
   load_maze_offsets #(X_OFFSET * 2), subOffset
@@ -81,8 +55,8 @@ updateWestCell
   jsr drawPath
   load_maze_offsets #(X_OFFSET * 2), subOffset
   ldx #WEST
-  jmp updateCell
-updateNorthCell
+  jmp .updateCell
+.updateNorthCell
   dec_maze_coord MAZE_Y_COORD, #4
   sta MAZE_Y_COORD
   load_maze_offsets #(Y_OFFSET * 2), subOffset
@@ -90,10 +64,10 @@ updateNorthCell
   jsr drawPath
   load_maze_offsets #(Y_OFFSET * 2), subOffset
   ldx #NORTH
-  jmp updateCell
-updateEast
-  jmp updateEastCell
-updateSouthCell
+  jmp .updateCell
+.updateEast
+  jmp .updateEastCell
+.updateSouthCell
   inc_maze_coord MAZE_Y_COORD, #4
   sta MAZE_Y_COORD
   load_maze_offsets #(Y_OFFSET * 2), addOffset
@@ -101,8 +75,8 @@ updateSouthCell
   jsr drawPath
   load_maze_offsets #(Y_OFFSET * 2), addOffset
   ldx #SOUTH
-  jmp updateCell
-updateEastCell
+  jmp .updateCell
+.updateEastCell
   inc_maze_coord MAZE_X_COORD, #4
   sta MAZE_X_COORD
 
@@ -111,126 +85,125 @@ updateEastCell
   jsr drawPath
   load_maze_offsets #(X_OFFSET * 2), addOffset
   ldx #EAST
-updateCell
+.updateCell
   store_maze_offsets
   TXA
   jsr draw
-  jmp beginMaze
+  jmp .carveMaze
 
-doneMaze
+doneMaze subroutine
   jsr drawPath
   rts
 
-
-backtrack
+backtrack subroutine
   ldy #0
   lda (MAZE_LSB),y
 
   cmp #MAZE_ORIGIN
-  beq atOrigin
+  beq .atOrigin
 
   TAX
   jsr drawPath
   TXA
 
   cmp #NORTH
-  beq bkTrackSouth
+  beq .bkTrackSouth
   cmp #SOUTH
-  beq bkTrackNorth
+  beq .bkTrackNorth
   cmp #EAST
-  beq bkTrackWest
-bkTrackEast
+  beq .bkTrackWest
+.bkTrackEast
   inc_maze_coord MAZE_X_COORD, #4
   sta MAZE_X_COORD
   load_maze_offsets #(X_OFFSET * 4), addOffset
-  jmp updateMazeAddr
-bkTrackSouth
+  jmp .updateAddress
+.bkTrackSouth
   inc_maze_coord MAZE_Y_COORD, #4
   sta MAZE_Y_COORD
 
   load_maze_offsets #(Y_OFFSET * 4), addOffset
-  jmp updateMazeAddr
-bkTrackNorth
+  jmp .updateAddress
+.bkTrackNorth
   dec_maze_coord MAZE_Y_COORD, #4
   sta MAZE_Y_COORD
 
   load_maze_offsets #(Y_OFFSET * 4), subOffset
-  jmp updateMazeAddr
-bkTrackWest
+  jmp .updateAddress
+.bkTrackWest
   dec_maze_coord MAZE_X_COORD, #4
   sta MAZE_X_COORD
 
   load_maze_offsets #(X_OFFSET * 4), subOffset
-updateMazeAddr
+.updateAddress
   sta MAZE_MSB
   lda LSB
   sta MAZE_LSB
   clc
   rts
-atOrigin
+.atOrigin
   sec
   rts
 
-isCellValid
-  beq checkNorthCell
+isCellValid subroutine
+  beq .checkNorthCell
   cmp #SOUTH
-  beq checkSouthCell
+  beq .checkSouthCell
   cmp #EAST
-  beq checkEastCell
+  beq .checkEastCell
 
-checkWestCell
+.checkWestCell
   dec_maze_coord MAZE_X_COORD, #4
-  bmi invalidCellValue
+  bmi .invalidCell
 
   load_maze_offsets #(X_OFFSET * 4), subOffset
 
   ldy #0
   lda (LSB),y
-  jmp checkCellValue
+  jmp .checkCell
 
-checkNorthCell
+.checkNorthCell
   dec_maze_coord MAZE_Y_COORD, #4
-  bmi invalidCellValue
+  bmi .invalidCell
 
   load_maze_offsets #(Y_OFFSET * 4), subOffset
 
   ldy #0
   lda (LSB),y
-  jmp checkCellValue
+  jmp .checkCell
 
-checkSouthCell
+.checkSouthCell
   inc_maze_coord MAZE_Y_COORD, #4
   cmp #BTM_SCRN_BNDRY
-  beq contSouth
-  bcs invalidCellValue
-contSouth
+  beq .contSouth
+  bcs .invalidCell
+.contSouth
   load_maze_offsets #(Y_OFFSET * 4), addOffset
 
   ldy #0
   lda (LSB),y
-  jmp checkCellValue
+  jmp .checkCell
 
-checkEastCell
+.checkEastCell
   inc_maze_coord MAZE_X_COORD, #4
   cmp #RGHT_SCRN_BNDRY
-  beq contEast
-  bcs invalidCellValue
-contEast
+  beq .contEast
+  bcs .invalidCell
+.contEast
   load_maze_offsets #(X_OFFSET * 4), addOffset
 
   ldy #0
   lda (LSB),y
-checkCellValue
+.checkCell
   cmp #CLEAR_CHAR
-  bne invalidCellValue
-validCellValue
+  bne .invalidCell
+.validCell
   sec
   rts
-invalidCellValue
+.invalidCell
   clc
   rts
 
-drawPath
+drawPath subroutine
   ldy #0
   lda #102
   sta (MAZE_LSB),y
@@ -246,79 +219,10 @@ drawPath
   sta (MAZE_LSB),y
   rts
 
-; needs LSB in accumulator and MSB in X
-; needs offset in OFFSET
-; returns values in OFFSET, LSB, AND MSB
-; also returns MSB accumulator
-addOffset
-  clc                             ; clear the carry
-  adc OFFSET                ; add to LSB
-  sta LSB                ; store result in LSB
-  TXA          
-  adc #0            ; add carry to MSB
-  sta MSB            ; store MSB
-  rts 
-
-; needs LSB in accumulator and MSB in X
-; needs offset in OFFSET
-; returns values in OFFSET, LSB, AND MSB
-; also returns MSB accumulator
-subOffset
-  sec
-  sbc OFFSET
-  sta LSB
-  TXA
-  sbc #0
-  sta MSB
-  rts
-
-clr
-	lda	#CLEAR_CHAR
-	ldx	#0
-clrloop:	
-  sta	$1e00,x
-	sta	$1f00,x
-	inx
-	bne	clrloop
-  rts
-
-; random value returned in accumulator
-; alters Y register
-random
-  lda LFSR
-  ldy LFSR
-  lsr LFSR              
-  lsr LFSR              
-  eor LFSR    ; 6th tap 
-  lsr LFSR             
-  eor LFSR    ; 5th tap
-  lsr LFSR             
-  eor LFSR    ; 4th tap
-  and #1               
-  sty LFSR
-  lsr LFSR
-  clc
-  ror
-  ror                  
-  ora LFSR             
-  sta LFSR
-  rts
-
   ; needs character to draw in accumulator
-draw
-  ldy #0                ; looks pointless to load 0
-  sta (MAZE_LSB),y            ; BUT IT NEEEDS IT
+draw subroutine
+  ldy #0
+  sta (MAZE_LSB),y
   rts
 
-startFrame	
-  lda	#$00
-	sta	FRAME	
-frame	
-  lda	$9004		; raster beam line number
-	cmp	#$0		; top of the screen
-	bne frame
-	inc	FRAME		; increase frame counter
-	lda	FRAME
-	cmp	#$20		; add delay
-	bne	frame
-  rts
+  include "subroutines.asm"
