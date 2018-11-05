@@ -29,17 +29,15 @@ S3 	     = $900c
 S4 	     = $900d
 VOLUME       = $900e
 
-
-
 ;;; *** CONSTANTS ***
 WHOL_NOTE = 64
 HALF_NOTE = 32
 QURT_NOTE = 16
-EIGT_NOTE = 8	
+EIGT_NOTE = 8
 SIXT_NOTE = 4
 
-SIXT_L = $00		; length of sixteenth note - low byte
-SIXT_H = $c0		; length of sixteenth note - high byte	
+SIXT_L = $24		; length of sixteenth note - low byte
+SIXT_H = $f4		; length of sixteenth note - high byte	
 	
 ;;; *** ZERO PAGE ***
 S1_INDEX  = $fa
@@ -59,10 +57,12 @@ end:	dc.w	0
 	;; set up the new IRQ vector
 music_IRQ:
 	lda	VIA_CONTROL
-	and	#$df	 	; set timer 2 to one-shot-mode
+	and	#$df		; 1101 1111 - clear third bit - timer 2 in one-shot-mode
+	and 	#$7f		; 0111 1111 - clear first bit - disable PB7 (timer 1)
+	ora	#$40		; 0100 0000 - set second bit  - free running mode (timer 1)
 	sta	VIA_CONTROL
 
-	lda	#$a0 		; enable timer 2
+	lda	#$e0 		; enable timer 1 and timer 2
 	sta 	VIA_ENABLE
 	
 	sei			; disable interrupts
@@ -93,12 +93,12 @@ start:
 	sta	S1
 	lda	S3NOTES
 	sta	S3
-
-	;; store the length of a single sixteenth note in timer 2 
+	
+	;; store the length of a single sixteenth note in timer 1
 	lda	#SIXT_L
-	sta	TIMER2_L
+	sta	TIMER1_L
 	lda	#SIXT_H
-	sta	TIMER2_H	; STARTS the timer
+	sta	TIMER1_H	; STARTS the timer
 
 	rts
 	
@@ -111,12 +111,12 @@ isr_next_note:
 	pha			; save old X
 	
 	lda	VIA_FLAGS
-	and	#$20		; check TIMER2 bit ($20 = 0010 0000)
-	bne	new_sixteenth	; TIMER2 bit is set so a sixteenth note has passed
+	and	#$40		; check TIMER1 bit ($40 = 0100 0000)
+	bne	new_sixteenth	; TIMER1 bit is set so a sixteenth note has passed
 
 	jmp	modulate	; else, continue on to modulation 
 	
-new_sixteenth:	
+new_sixteenth:
 	dec	S1_DUR		; single sixteenth note has passed
 	bne	check_S3	; if not zero, don't change the note and check next voice
 change_S1:	
@@ -157,9 +157,9 @@ change_S3:			; else, change S3 note
 done_notes:			; we have checked all the notes
 	;;  restart the timer
 	lda	#SIXT_L
-	sta	TIMER2_L	
+	sta	TIMER1_L	
 	lda	#SIXT_H
-	sta	TIMER2_H	; STARTS the timer and clears the interrupt request
+	sta	TIMER1_H	; STARTS the timer and clears the interrupt request
 	
 	jmp	modulate	; modulate the notes
 
@@ -177,9 +177,9 @@ done_song:
 
 	;;  restart the timer
 	lda	#SIXT_L
-	sta	TIMER2_L	
+	sta	TIMER1_L	
 	lda	#SIXT_H
-	sta	TIMER2_H	; STARTS the timer and clears the interrupt request
+	sta	TIMER1_H	; STARTS the timer and clears the interrupt request
 
 	jmp 	done_mod
 modulate:			; modulate the notes
