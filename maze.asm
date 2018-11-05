@@ -31,9 +31,15 @@ end
   lda #SEED
   sta LFSR
 
-beginMaze
-  jsr startFrame
+  jsr beginMaze
 
+; can remove. this is just to check if it's done
+loop
+  sta 7680
+  jmp loop
+
+
+beginMaze
   jsr random
   and #3
   sta MAZE_DIR
@@ -60,7 +66,6 @@ invalidCell
   jsr backtrack
   bcc beginMaze
   jmp doneMaze
-
 validCell
   lda MAZE_DIR
   beq updateNorthCell
@@ -73,7 +78,6 @@ updateWestCell
   sta MAZE_X_COORD
   load_maze_offsets #(X_OFFSET * 2), subOffset
   store_maze_offsets
-  ;ldx #WEST
   jsr drawPath
   load_maze_offsets #(X_OFFSET * 2), subOffset
   ldx #WEST
@@ -83,7 +87,6 @@ updateNorthCell
   sta MAZE_Y_COORD
   load_maze_offsets #(Y_OFFSET * 2), subOffset
   store_maze_offsets
-  ;ldx #NORTH
   jsr drawPath
   load_maze_offsets #(Y_OFFSET * 2), subOffset
   ldx #NORTH
@@ -95,7 +98,6 @@ updateSouthCell
   sta MAZE_Y_COORD
   load_maze_offsets #(Y_OFFSET * 2), addOffset
   store_maze_offsets
-  ;ldx #SOUTH
   jsr drawPath
   load_maze_offsets #(Y_OFFSET * 2), addOffset
   ldx #SOUTH
@@ -106,7 +108,6 @@ updateEastCell
 
   load_maze_offsets #(X_OFFSET * 2), addOffset
   store_maze_offsets
-  ;ldx #EAST
   jsr drawPath
   load_maze_offsets #(X_OFFSET * 2), addOffset
   ldx #EAST
@@ -118,7 +119,7 @@ updateCell
 
 doneMaze
   jsr drawPath
-  jmp doneMaze
+  rts
 
 
 backtrack
