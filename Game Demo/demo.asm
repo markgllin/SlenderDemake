@@ -21,6 +21,18 @@ start:
 	lda	#01	; white characters
 	sta	CHR_C
 
+	lda	#255		; custom character set
+	sta	$9005
+
+	;; load zeros into the "0" character of our custom charset
+	ldx	#$00
+	lda	#$00
+copy_blank:
+	sta	$1c00,X
+	inx
+	cpx	#$08
+	bne	copy_blank
+	
 	lda	#$00 		; used to be 20 - now 0 because easier comparisons
 	ldx	#$00	
 clear_loop:			; clear the screen
@@ -29,18 +41,6 @@ clear_loop:			; clear the screen
 	inx
 	bne	clear_loop
 
-	lda	#255		; custom character set
-	sta	$9005
-
-	;; copy the normal BLANK character (20) to the (00) character
-	ldx	#$00
-copy_blank:
-	lda	$1d00,X		; space character
-	sta	$1c00,X
-	inx
-	cpx	#$08
-	bne	copy_blank
-	
 	;; now, load the sprites into memory
   	ldx	#00
 copy_sprites:
