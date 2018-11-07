@@ -57,3 +57,27 @@ SECOND_H	  = #$f4	; high byte of $f906
 SECOND_L	  = #$24	; low  byte of $f906
 NUM_SEC		  = #$11	; 1 MORE THAN how many ^ it takes for a single second
 
+CLEAR_CHAR           = 0
+
+LFT_SCRN_BNDRY      = 0
+TOP_SCRN_BNDRY      = 0
+RGHT_SCRN_BNDRY     = 21
+BTM_SCRN_BNDRY      = 21
+
+X_OFFSET            = 1
+Y_OFFSET            = 22
+
+MAZE_ORIGIN         = 94
+
+NORTH               = 0   ;@
+SOUTH               = 1   ;A
+EAST                = 2   ;B
+WEST                = 3   ;C
+
+SCAN_KEYBOARD         = $c5
+W_KEY                 = 9
+A_KEY                 = 17
+S_KEY                 = 41
+D_KEY                 = 18
+
+SEED                  = 240   ; can be anything but 0

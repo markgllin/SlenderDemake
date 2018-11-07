@@ -40,3 +40,18 @@ SCORE_LSB	 = $22
 SCORE_MSB	 = $23
 
 LFSR 		 = $24	
+
+OFFSET              = $25
+LSB                 = $26
+MSB                 = $27
+
+MAZE_X_COORD        = $28
+MAZE_Y_COORD        = $29
+MAZE_LSB            = $2a
+MAZE_MSB            = $2b
+MAZE_DIR            = $2c
+
+TREE_CLR          = $2e
+TREE_SPRITE       = $2f
+TREE_CLR_LSB      = $30
+TREE_LSB          = $31

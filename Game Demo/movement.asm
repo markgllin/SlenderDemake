@@ -103,7 +103,7 @@ save_previous:
 	rts
 
 ; needs move increment in Y register
-addOffset:
+addSpriteOffset:
 	jsr	save_previous
 	tya                     ;2      ; move increment in acumulator
   	clc                     ;2      ; clear the carry
@@ -123,7 +123,7 @@ addOffset:
 addOffset_no_carry:	; total no carry: 22 cycles
  	rts		; total with carry: 32 cycles
 	
-subOffset:
+subSpriteOffset:
 	jsr	save_previous
 	Lda 	SPRITE_LSB    	;3
 	sty 	SPRITE_LSB   	;3
