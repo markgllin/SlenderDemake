@@ -1,5 +1,4 @@
 ;;; ----- DRAWING ROUTINES
-;;; ----- DRAWING ROUTINES
 
 place_letter:
 	lda	LFSR
@@ -21,40 +20,17 @@ place_letter:
 	sta	(LETTER_CLR_LSB),y
 	
 	rts
-	
-drawChar:
-	ldx	CURR_SPRITE
-	ldy	#$00    ; draw 1st char
-	jsr	draw
-	inx      	; draw 2nd char
-	ldy	#$16
-	jsr	draw
-	inx 	 	; draw 3rd char
-	ldy	#$01
-	jsr	draw
-	inx   	   	; draw 4th char
-	ldy 	#$17
-	jsr 	draw
-	
-; needs sprite in X 
-; needs offset in y
-draw:
-	lda	CURR_CLR
-	sta	(SPRITE_CLR_LSB),y
-	txa
-	sta 	(SPRITE_LSB),y
-	rts
 
-erase:	
-	ldx	#0     ; load blank
+erase:
+	ldx #0			; load blank
 	ldy	#$00
-	jsr 	draw
-	ldy 	#$01
-	jsr 	draw
-	ldy 	#$16
-	jsr 	draw
-	ldy 	#$17
-	jsr 	draw
+	draw_sprite CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
+	ldy	#$01
+	draw_sprite CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB	
+	ldy	#$16
+	draw_sprite CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB	
+	ldy	#$17
+	draw_sprite CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB	
 	rts
 
 ;;; ---- SPRITES AND STUFF

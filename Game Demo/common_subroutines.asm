@@ -38,27 +38,27 @@ random subroutine
 ; needs offset in OFFSET
 ; returns values in OFFSET, LSB, AND MSB
 ; also returns MSB accumulator
-; addOffset subroutine
-;   clc                             ; clear the carry
-;   adc OFFSET                ; add to LSB
-;   sta LSB                ; store result in LSB
-;   TXA          
-;   adc #0            ; add carry to MSB
-;   sta MSB            ; store MSB
-;   rts 
+addOffset subroutine
+  clc                             ; clear the carry
+  adc OFFSET                ; add to LSB
+  sta LSB                ; store result in LSB
+  TXA          
+  adc #0            ; add carry to MSB
+  sta MSB            ; store MSB
+  rts 
 
 ; needs LSB in accumulator and MSB in X
 ; needs offset in OFFSET
 ; returns values in OFFSET, LSB, AND MSB
 ; also returns MSB accumulator
-; subOffset subroutine
-;   sec
-;   sbc OFFSET
-;   sta LSB
-;   TXA
-;   sbc #0
-;   sta MSB
-;   rts
+subOffset subroutine
+  sec
+  sbc OFFSET
+  sta LSB
+  TXA
+  sbc #0
+  sta MSB
+  rts
 
 
 startFrame subroutine

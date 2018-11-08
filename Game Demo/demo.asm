@@ -35,7 +35,9 @@ copy_blank:
 	bne	copy_blank
 	
 	jsr clr
-
+; 	jsr generateMaze
+; loop
+; 	jmp loop
 	;; now, load the sprites into memory
   	ldx	#00
 copy_sprites:
@@ -156,8 +158,10 @@ start_timer:
 input:
 	;; check game status FIRST
 	lda	GAME_STATUS
-	beq	end_game
+	bne	continue_game
+	jsr end_game
 
+continue_game:
 	;; not end game so continue
 	jsr startFrame
 	lda SCAN_KEYBOARD
@@ -208,7 +212,7 @@ right
 	sta	CURR_SPRITE
 doneInput:
 	jsr	check_movement
-	jsr	drawChar
+	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
 	jmp	input
 
 ;;; ----- END GAME
@@ -216,6 +220,7 @@ doneInput:
 end_game:
 	jmp	end_game	
 
+	INCLUDE "maze.asm"
 	INCLUDE "common_subroutines.asm"
 	INCLUDE	"movement.asm"
 	INCLUDE	"interrupts.asm"
