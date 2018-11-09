@@ -205,7 +205,7 @@ isCellValid subroutine
 
 drawPath subroutine
   ldy #0
-  lda #102
+  lda #PATH
   sta (MAZE_LSB),y
   iny
   sta (MAZE_LSB),y
@@ -213,13 +213,13 @@ drawPath subroutine
   CLC
   adc #21
   TAY
-  lda #102
+  lda #PATH
   sta (MAZE_LSB),y
   iny
   sta (MAZE_LSB),y
   rts
 
-  ; needs character to draw in accumulator
+; needs character to draw in accumulator
 drawCell subroutine
   ldy #0
   sta (MAZE_LSB),y

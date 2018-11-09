@@ -31,21 +31,21 @@ TIMER2_L     = $9118		; timer 2 low order byte
 TIMER2_H     = $9119		; timer 2 high order byte
 
 ;;; CUSTOM CHARSET ADDRESSES
-SPACE_ADDRESS   = $1c00   	; where the space character starts
-SPRITE_ADDRESS  = $1c08		; where the sprites start
-NUMBERS_ADDRESS = $1cb8		; where numbers start in custom charset
+SPACE_ADDRESS   = $1c00   ; where the space character starts
+SPRITE_ADDRESS  = $1c10		; where the sprites start
+NUMBERS_ADDRESS = $1cc0		; where numbers start in custom charset
 	
 
 ;;; ---- CONSTANTS
 SPACE             = #$00	; @
-CHAR_FORWARD      = #$01	; A = character facing forward
-CHAR_BCKWARD      = #$05	; E = character facing backward
-CHAR_RIGHT        = #$09	; I = character facing to the right
-CHAR_LEFT         = #$0d	; M = character facing to the left
-TREE1             = #$11	; Q = tree sprite  
-ITEM_LETTER	  = #$15 	; U = letter sprite
-NUM_ZERO	  = #$17	; W = start of number 0
-NUM_NINE	  = #$20	; SPACE = start of number 9 
+CHAR_FORWARD      = #$02	; A = character facing forward
+CHAR_BCKWARD      = #$06	; E = character facing backward
+CHAR_RIGHT        = #$0a	; I = character facing to the right
+CHAR_LEFT         = #$0e	; M = character facing to the left
+TREE1             = #$12	; Q = tree sprite  
+ITEM_LETTER	  = #$16 	; U = letter sprite
+NUM_ZERO	  = #$18	; W = start of number 0
+NUM_NINE	  = #$21	; SPACE = start of number 9 
 
 SPRITE_CHAR_COLOR = #$09 	; multi-colour white
 TREE_CHAR_COLOR   = #$0d	; multi-colour green
@@ -69,10 +69,11 @@ Y_OFFSET            = 22
 
 MAZE_ORIGIN         = 94
 
-NORTH               = 0   ;@
-SOUTH               = 1   ;A
-EAST                = 2   ;B
-WEST                = 3   ;C
+NORTH               = 1 
+SOUTH               = 2 
+EAST                = 3 
+WEST                = 4 
+PATH                = 1
 
 SCAN_KEYBOARD         = $c5
 W_KEY                 = 9

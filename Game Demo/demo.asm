@@ -29,17 +29,16 @@ start:
 	ldx	#$00
 	lda	#$00
 copy_blank:
-	sta	$1c00,X
+	sta	SPACE_ADDRESS,X
 	inx
-	cpx	#$08
+	cpx	#16
 	bne	copy_blank
 	
 	jsr clr
-; 	jsr generateMaze
-; loop
-; 	jmp loop
+	jsr generateMaze
+
 	;; now, load the sprites into memory
-  	ldx	#00
+  ldx	#00
 copy_sprites:
 	lda	sprite,X
   sta	SPRITE_ADDRESS,X	
