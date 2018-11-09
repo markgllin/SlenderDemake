@@ -3,6 +3,7 @@ TODO:
 - ~~maze generation~~
 - ~~sprite design~~
 - audio
+- multiple rooms
 
   (Technically) working but currently using TIMER2 instead of TIMER1. Need to figure out TIMER1 since the new in-game timer I added uses TIMER2. I think TIMER1 is a better fit for music anyway, it's just way more confusing. So more work needs to be done here. PLUS the music itself is still garbage but that is honestly something that can be done once we have a better idea of how much space we have left to use.
 
@@ -25,3 +26,9 @@ TODO:
 Maybes
 - text box (e.g. 'You here some rustling')
 - add slenderman
+
+Possible Optimizations:
+- use same add/subOffset macro/routines
+- set 'blank' character to something NOT 0. Set PATH tile to 0 so that we can omit a
+  cmp everytime player moves (not as simple as actually swapping the values. Some 
+  debugging required) 
