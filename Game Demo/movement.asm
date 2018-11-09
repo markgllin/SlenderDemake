@@ -3,15 +3,19 @@ check_movement:
 	;; collision checks
 	ldy	#$00		; top left corner
 	lda	(SPRITE_LSB),y
+	cmp #PATH
 	bne	collision
 	ldy	#$01		; top right corner
 	lda	(SPRITE_LSB),y
+	cmp #PATH
 	bne	collision
 	ldy	#$16		; bottom left corner
 	lda	(SPRITE_LSB),y
+	cmp #PATH
 	bne	collision
 	ldy	#$17		; bottom right corner
 	lda	(SPRITE_LSB),y
+	cmp #PATH
 	bne	collision
 
 	;; boundary checks
@@ -27,6 +31,8 @@ check_movement:
 	;; no collisions 
 	rts
 collision:
+	ldx #$18
+	stx 8165
 	cmp	#ITEM_LETTER
 	beq	letter_found
 	cmp	#ITEM_LETTER + 1

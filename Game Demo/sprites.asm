@@ -22,7 +22,7 @@ place_letter:
 	rts
 
 erase:
-	ldx #0			; load blank
+	ldx #PATH			; load blank
 	ldy	#$00
 	draw_sprite CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
 	ldy	#$01

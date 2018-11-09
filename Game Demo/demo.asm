@@ -135,7 +135,7 @@ draw_tree:
 	draw_char TREE_SPRITE, TREE_CLR, SPRITE_CLR_LSB, SPRITE_LSB
 	
 draw_sprite2:
-	lda	#$20		; offset sprite
+	lda	#$35		; offset sprite
 	sta	SPRITE_LSB
 	sta	SPRITE_CLR_LSB
 	
