@@ -93,6 +93,19 @@ generateMaze subroutine
 
 doneMaze subroutine
   jsr drawPath
+  
+  lda #MAZE_ENTRANCE_LSB
+  sta MAZE_LSB
+  lda #MAZE_ENTRANCE_MSB
+  sta MAZE_MSB
+  jsr drawPath
+
+  lda #MAZE_EXIT_LSB
+  sta MAZE_LSB
+  lda #MAZE_EXIT_MSB
+  sta MAZE_MSB
+  jsr drawPath
+
   rts
 
 backtrack subroutine

@@ -17,16 +17,6 @@ check_movement:
 	lda	(SPRITE_LSB),y
 	cmp #PATH
 	bne	collision
-
-	;; boundary checks
-	ldx	SPRITE_X
-	cpx	#$ff		; exceed left
-	beq	invalid_movement
-	cpx	#$15		; exceed right
-	beq	invalid_movement
-	ldy	SPRITE_Y
-	cpy	#$16		; exceed bottom
-	beq	invalid_movement
 	
 	;; no collisions 
 	rts

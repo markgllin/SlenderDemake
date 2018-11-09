@@ -69,6 +69,11 @@ Y_OFFSET          = 22
 
 MAZE_ORIGIN       = 94
 
+MAZE_ENTRANCE_LSB = #$dc
+MAZE_ENTRANCE_MSB = #$1e
+MAZE_EXIT_LSB     = #$f0
+MAZE_EXIT_MSB     = #$1e
+
 NORTH             = 1 
 SOUTH             = 2 
 EAST              = 3 
