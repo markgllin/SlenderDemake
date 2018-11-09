@@ -31,8 +31,6 @@ check_movement:
 	;; no collisions 
 	rts
 collision:
-	ldx #$18
-	stx 8165
 	cmp	#ITEM_LETTER
 	beq	letter_found
 	cmp	#ITEM_LETTER + 1
@@ -63,7 +61,7 @@ score_no_wrap:
 
 done_score:	
 	;; and erase the letter
-	lda	#$00
+	lda	#PATH
 	ldy	#$00
 	sta	(LETTER_LSB),y
 	iny

@@ -7,6 +7,16 @@ place_letter:
 	sta	LETTER_LSB
 	sta	LETTER_CLR_LSB	
 
+	ldy #$0
+	lda (LETTER_LSB),y
+	cmp #PATH
+	bne place_letter
+
+	ldy #$1
+	lda (LETTER_LSB),y
+	cmp #PATH
+	bne place_letter
+
 	ldy	#$0
 	lda	#ITEM_LETTER
 	sta	(LETTER_LSB),y

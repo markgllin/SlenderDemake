@@ -28,12 +28,28 @@ start:
 	;; load zeros into the "0" character of our custom charset
 	ldx	#$00
 	lda	#$00
+	
 copy_blank:
 	sta	SPACE_ADDRESS,X
 	inx
 	cpx	#16
 	bne	copy_blank
-	
+
+;; COMMENT out copy_blank and uncomment copy_blank_debug
+;; and copy_blank2_debug to debug with maze visible
+; copy_blank_debug:
+; 	sta	SPACE_ADDRESS,X
+; 	inx
+; 	cpx	#8
+; 	bne	copy_blank_debug
+
+; 	lda	#$ff
+; copy_blank2_debug:
+; 	sta	SPACE_ADDRESS,X
+; 	inx
+; 	cpx	#16
+; 	bne	copy_blank2_debug
+
 	jsr clr
 	jsr generateMaze
 
