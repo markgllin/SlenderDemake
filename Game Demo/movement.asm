@@ -100,9 +100,9 @@ save_previous:
 addSpriteOffset:
 	jsr	save_previous
 	tya                     ;2      ; move increment in acumulator
-  	clc                     ;2      ; clear the carry
-  	adc 	SPRITE_LSB    	;3      ; add to LSB
-  	sta 	SPRITE_LSB	;3      ; store result in LSB
+  clc                     ;2      ; clear the carry
+  adc SPRITE_LSB    	;3      ; add to LSB
+  sta SPRITE_LSB	;3      ; store result in LSB
 	
 	tya			;2
 	clc			;2
@@ -114,16 +114,16 @@ addSpriteOffset:
 	inc	SPRITE_MSB	;5
 	inc	SPRITE_CLR_MSB	;5
 
-addOffset_no_carry:	; total no carry: 22 cycles
- 	rts		; total with carry: 32 cycles
+addOffset_no_carry:
+ 	rts	
 	
 subSpriteOffset:
 	jsr	save_previous
-	Lda 	SPRITE_LSB    	;3
-	sty 	SPRITE_LSB   	;3
-	sec			;2     ; clear the borrow
-	sbc 	SPRITE_LSB    	;3     ; sub from LSB
-	sta 	SPRITE_LSB    	;3     ; store result in LSB
+	Lda SPRITE_LSB    	;3
+	sty SPRITE_LSB   	;3
+	sec		;2     ; clear the borrow
+	sbc SPRITE_LSB    	;3     ; sub from LSB
+	sta SPRITE_LSB    	;3     ; store result in LSB
 
 	lda	SPRITE_CLR_LSB	;3
 	sty	SPRITE_CLR_LSB	;3
@@ -136,7 +136,6 @@ subSpriteOffset:
 	dec	SPRITE_MSB    ;3
 	dec	SPRITE_CLR_MSB	;3
 	
-subOffset_no_borrow:	; total without borrow: 30
-			; total with borrow: 36
+subOffset_no_borrow:
 	rts      
 	

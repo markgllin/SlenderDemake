@@ -54,4 +54,6 @@ MAZE_DIR            = $2c
 TREE_CLR          	= $2e
 TREE_SPRITE       	= $2f
 TREE_CLR_LSB      	= $30
-TREE_LSB          	= $31
+TREE_CLR_MSB      	= $31
+TREE_LSB          	= $32
+TREE_MSB						= $33

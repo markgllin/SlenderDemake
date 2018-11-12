@@ -32,3 +32,5 @@ Possible Optimizations:
 - set 'blank' character to something NOT 0. Set PATH tile to 0 so that we can omit a
   cmp everytime player moves (not as simple as actually swapping the values. Some 
   debugging required) 
+- do we really need a `SPRITE_LSB/MSB` and `SPRITE_CLR_LSB/MSB`? as far I can tell, they're always equivalent?
+- i think...we can modify the sub/addoffset subroutines to use indirect indexing and get rid of the garbage math w/ updating lsb and msb's separately...dont fix what's not broken though ¯\_(ツ)_/¯. will deal with it when i have time

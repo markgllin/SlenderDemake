@@ -139,8 +139,8 @@ init_score_loop:
 	
 draw_tree:
 	lda	#$e6		; offset tree
-	sta	SPRITE_LSB
-	sta	SPRITE_CLR_LSB
+	sta	TREE_LSB
+	sta	TREE_CLR_LSB
 	
 	lda	#TREE_CHAR_COLOR
 	sta	CURR_CLR
@@ -148,7 +148,7 @@ draw_tree:
 	lda	#TREE1
 	sta	CURR_SPRITE
 	sta TREE_SPRITE
-	draw_char TREE_SPRITE, TREE_CLR, SPRITE_CLR_LSB, SPRITE_LSB
+	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
 	
 draw_sprite2:
 	lda	#$35		; offset sprite
@@ -228,6 +228,7 @@ right
 doneInput:
 	jsr	check_movement
 	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
+	; jsr draw_env
 	jmp	input
 
 ;;; ----- END GAME

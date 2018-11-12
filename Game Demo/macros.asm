@@ -76,3 +76,51 @@
 	draw_sprite [{2}], [{3}], [{4}]
   endm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; needs sprite to erase in [{1}],
+; sprite_clr in [{2}],
+; sprite_clr_lsb in [{3}]
+; sprite_lsb in [{4}]
+  mac erase_char
+	ldx	[{1}]
+	ldy	#$00    ; draw 1st char
+	draw_sprite [{2}], [{3}], [{4}]
+	ldy	#$16
+	draw_sprite [{2}], [{3}], [{4}]
+	ldy	#$01
+	draw_sprite [{2}], [{3}], [{4}]
+	ldy #$17
+	draw_sprite [{2}], [{3}], [{4}]
+  endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; needs offset in [{1}]
+; needs sprite lsb in [{2}]
+; needs sprite msb in [{3}]
+; needs sprite clr lsb in [{4}]
+; needs sprite clr msb in [{5}]
+; needs add/subOffset subroutine in [{6}]
+  mac update_tree_addr
+  lda [{1}]
+  sta OFFSET
+  lda [{2}]
+  ldx [{3}]
+  jsr [{6}]
+  sta TREE_MSB
+  lda LSB
+  sta TREE_LSB
+
+  lda [{4}]
+  ldx [{5}]
+  jsr [{6}]
+  sta TREE_CLR_MSB
+  lda LSB
+  sta TREE_CLR_LSB
+
+  ldy #$00
+  lda (TREE_LSB),y
+  cmp #PATH
+  endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;

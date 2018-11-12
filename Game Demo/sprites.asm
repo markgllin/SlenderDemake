@@ -32,19 +32,83 @@ place_letter:
 	rts
 
 erase:
-	ldx #PATH			; load blank
-	ldy	#$00
-	draw_sprite CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
-	ldy	#$01
-	draw_sprite CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB	
-	ldy	#$16
-	draw_sprite CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB	
-	ldy	#$17
-	draw_sprite CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB	
+	erase_char #PATH, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
+	;jsr erase_env
 	rts
 
+; erase_env: subroutine
+; .draw_NW_tree
+; 	update_tree_addr #46, SPRITE_LSB, SPRITE_MSB, SPRITE_CLR_LSB, SPRITE_CLR_MSB, subOffset
+;   beq .draw_N_tree
+; 	erase_char #PATH, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_N_tree
+; 	update_tree_addr #2, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+; 	beq .draw_NE_tree
+; 	erase_char #PATH, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_NE_tree
+; 	update_tree_addr #2, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_W_tree
+; 	erase_char #PATH, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_W_tree
+; 	update_tree_addr #40, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_E_tree
+; 	erase_char #PATH, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_E_tree
+; 	update_tree_addr #4, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_SW_tree
+; 	erase_char #PATH, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_SW_tree
+; 	update_tree_addr #40, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_S_tree
+; 	erase_char #PATH, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_S_tree
+; 	update_tree_addr #2, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_SE_tree
+; 	erase_char #PATH, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_SE_tree
+; 	update_tree_addr #2, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .done_trees
+; 	erase_char #PATH, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .done_trees
+; 	rts
+
+; draw_env: subroutine
+; .draw_NW_tree
+; 	update_tree_addr #46, SPRITE_LSB, SPRITE_MSB, SPRITE_CLR_LSB, SPRITE_CLR_MSB, subOffset
+;   beq .draw_N_tree
+; 	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_N_tree
+; 	update_tree_addr #2, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+; 	beq .draw_NE_tree
+; 	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_NE_tree
+; 	update_tree_addr #2, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_W_tree
+; 	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_W_tree
+; 	update_tree_addr #40, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_E_tree
+; 	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_E_tree
+; 	update_tree_addr #4, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_SW_tree
+; 	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_SW_tree
+; 	update_tree_addr #40, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_S_tree
+; 	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_S_tree
+; 	update_tree_addr #2, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .draw_SE_tree
+; 	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .draw_SE_tree
+; 	update_tree_addr #2, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
+;   beq .done_trees
+; 	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
+; .done_trees
+; 	rts
+
 ;;; ---- SPRITES AND STUFF
-	
 sprite:
 	;;  sprite facing forward
 	BYTE	21,85,118,89,89,30,90,85
