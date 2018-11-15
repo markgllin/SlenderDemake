@@ -18,6 +18,13 @@ IRQ_L             = $0314		; low byte of IRQ vector
 IRQ_H             = $0315		; high byte of IRQ vector 
 OLD_IRQ           = $eabf
 	
+S1 	     	  = $900a 		; reference: page 96
+S2 	     	  = $900b
+S3 	     	  = $900c
+S4 	     	  = $900d
+VOLUME       	  = $900e
+
+
 VIA_CONTROL       = $911b
 VIA_FLAGS         = $911d		; reference: page 218
 VIA_ENABLE        = $911e
@@ -56,6 +63,13 @@ TREE_CHAR_COLOR   = #$0d   	; multi-colour green
 SECOND_H	        = #$f4    ; high byte of $f906
 SECOND_L	        = #$24    ; low  byte of $f906
 NUM_SEC		        = #$11    ; 1 MORE THAN how many ^ it takes for a single second
+
+;; music stuff
+WHOL_NOTE = 64
+HALF_NOTE = 32
+QURT_NOTE = 16
+EIGT_NOTE = 8	
+SIXT_NOTE = 4
 
 CLEAR_CHAR        = 0
 
