@@ -1,5 +1,5 @@
 	;; set up the new IRQ vector for timer 2
-timer2_IRQ:
+timer2_IRQ:	; ~~~ 1540
 	lda	VIA_CONTROL
 	and	#$df	 	; set timer 2 to one-shot-mode
 	sta	VIA_CONTROL
@@ -31,13 +31,13 @@ isr_check_irq:
 	lda	VIA_FLAGS
 	and	#$20		; check TIMER2 bit ($20 = 0010 0000)
 	bne	isr_timer2	; TIMER2 bit is set
-	jmp	isr_done_timer2 ; TIMER2 did NOT cause the IRQ
+	jmp	modulate        ; TIMER2 did NOT cause the IRQ
 	
 isr_timer2:
 	;; check end game condition in case it's already end game
 	lda	GAME_STATUS
 	bne	isr_not_endgame	
-	jmp	isr_done_timer2
+	jmp	modulate
 
 isr_not_endgame:
 	;; start by restarting the timer 
@@ -49,7 +49,7 @@ isr_not_endgame:
 	dec	TIMER_CTR
 	lda	TIMER_CTR
 	beq	isr_second_passed
-	jmp	isr_done_timer2
+	jmp	modulate
 
 isr_second_passed:
 	;; a second has passed
@@ -122,8 +122,9 @@ isr_trigger_end_game:
 	
 	lda	#$0
 	sta	GAME_STATUS
+	jmp 	isr_done_timer2
 	
-isr_update_music:
+isr_update_music:	; ~~~ 15ce
 	dec	S1_DUR		; single sixteenth note has passed
 	bne	isr_check_S3	; if not zero, don't change the note and check next voice
 isr_change_S1:	
@@ -145,7 +146,7 @@ isr_change_S1:
 	sta	S1_DUR
 isr_check_S3:
 	dec	S3_DUR
-	bne 	isr_done_notes	; all voices checked; done
+	bne 	modulate	; all voices checked; done
 isr_change_S3:			; else, change S3 note
 	;; move the S3 pointer to the next note
 	ldx	S3_INDEX
@@ -161,7 +162,7 @@ isr_change_S3:			; else, change S3 note
 	inx
 	lda	S3NOTES,X
 	sta	S3_DUR
-isr_done_notes:			; we have checked all the notes
+
 	jmp	modulate	; modulate the notes
 
 isr_done_song:

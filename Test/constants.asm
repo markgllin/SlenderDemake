@@ -65,11 +65,11 @@ SECOND_L	        = #$24    ; low  byte of $f906
 NUM_SEC		        = #$11    ; 1 MORE THAN how many ^ it takes for a single second
 
 ;; music stuff
-WHOL_NOTE = 64
-HALF_NOTE = 32
-QURT_NOTE = 16
-EIGT_NOTE = 8	
-SIXT_NOTE = 4
+WHOL_NOTE = 8
+HALF_NOTE = 4
+QURT_NOTE = 2
+EIGT_NOTE = 1	
+SIXT_NOTE = 0
 
 CLEAR_CHAR        = 0
 
