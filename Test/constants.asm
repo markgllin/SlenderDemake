@@ -29,10 +29,10 @@ VIA_CONTROL       = $911b
 VIA_FLAGS         = $911d		; reference: page 218
 VIA_ENABLE        = $911e
 
-TIMER1_LOC        = $9114		; timer 1 low order counter
-TIMER1_HOC        = $9115		; timer 1 high order counter
-TIMER1_LOL        = $9116		; timer 1 low order latch
-TIMER1_HOL        = $9117		; timer 1 high order latch
+TIMER1_L     = $9114		; timer 1 low order byte
+TIMER1_H     = $9115		; timer 1 high order byte
+TIMER1_LTL   = $9116		; timer 1 low byte to load
+TIMER1_HTL   = $9117		; timer 1 high byte to load
 	
 TIMER2_L          = $9118		; timer 2 low order byte
 TIMER2_H          = $9119		; timer 2 high order byte
@@ -65,11 +65,14 @@ SECOND_L	        = #$24    ; low  byte of $f906
 NUM_SEC		        = #$11    ; 1 MORE THAN how many ^ it takes for a single second
 
 ;; music stuff
-WHOL_NOTE = 8
-HALF_NOTE = 4
-QURT_NOTE = 2
-EIGT_NOTE = 1	
-SIXT_NOTE = 0
+WHOL_NOTE = 64
+HALF_NOTE = 32
+QURT_NOTE = 16
+EIGT_NOTE = 8	
+SIXT_NOTE = 4
+
+SIXT_L = $ff		; length of sixteenth note - low byte
+SIXT_H = $ff		; length of sixteenth note - high byte	
 
 CLEAR_CHAR        = 0
 

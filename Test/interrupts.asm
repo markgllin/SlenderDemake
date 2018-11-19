@@ -1,45 +1,59 @@
-	;; set up the new IRQ vector for timer 2
-timer2_IRQ:	; ~~~ 1540
-	lda	VIA_CONTROL
-	and	#$df	 	; set timer 2 to one-shot-mode
-	sta	VIA_CONTROL
 
-	lda	#$a0 		; enable timer 2
+timer_IRQ:
+	lda	VIA_CONTROL
+	and	#$df	 	; 1101 1111 - set timer 2 to one-shot-mode
+	and 	#$7f		; 0111 1111 - clear first bit - disable PB7 (timer 1)
+	ora	#$40		; 0100 0000 - set second bit  - free running mode (timer 1)
+	sta	VIA_CONTROL
+	lda	#$e0 		; enable timer 1 and timer 2
 	sta 	VIA_ENABLE
 	
 	sei			; disable interrupts
-
-	lda	#<isr_check_irq	; get low byte of ISR address
+	lda	#<isr_manager	; get low byte of ISR address
 				; reference for this notation: page 204
 	sta	IRQ_L
-	lda	#>isr_check_irq	; get high byte of ISR address
+	lda	#>isr_manager	; get high byte of ISR address
 	sta	IRQ_H
-
 	cli			; enable interrupts again
 	rts
 
 ;;; ---- INTERRUPT SERVICE ROUTINES
 
-isr_check_irq:
+isr_manager:
 	pha			; save old A
 	txa
 	pha			; save old X
 	tya
 	pha			; save old Y
-
+check_timer2:
 	;; check that the interrupt is happening from timer 2
 	lda	VIA_FLAGS
-	and	#$20		; check TIMER2 bit ($20 = 0010 0000)
-	bne	isr_timer2	; TIMER2 bit is set
-	jmp	modulate        ; TIMER2 did NOT cause the IRQ
-	
-isr_timer2:
+	and	#$20		 ; check TIMER2 bit ($20 = 0010 0000)
+	beq	check_timer1	 ; TIMER2 bit is NOT set 
+	jmp	isr_update_timer ; TIMER2 bit is set
+check_timer1:	
+	lda	VIA_FLAGS
+	and	#$40		; check TIMER1 bit ($40 = 0100 0000)
+	beq	done_interrupt  ; TIMER1 bit is not set either so done
+	jmp	isr_update_music
+done_interrupt:	
+	pla
+	tay			; restore old Y
+	pla
+	tax			; restore old X
+	pla			; restore old A
+
+	jmp	OLD_IRQ		; continue on to old IRQ
+
+	rti
+
+;; update timer happens FIRST
+isr_update_timer:
 	;; check end game condition in case it's already end game
 	lda	GAME_STATUS
-	bne	isr_not_endgame	
-	jmp	modulate
+	beq	check_timer1
 
-isr_not_endgame:
+	;; correct timer interrupt so do the thing
 	;; start by restarting the timer 
 	lda	SECOND_L
 	sta	TIMER2_L	
@@ -48,10 +62,8 @@ isr_not_endgame:
 
 	dec	TIMER_CTR
 	lda	TIMER_CTR
-	beq	isr_second_passed
-	jmp	modulate
+	bne	check_timer1    ; counter is not zero
 
-isr_second_passed:
 	;; a second has passed
 	lda	#NUM_SEC	; reload counter
 	sta	TIMER_CTR
@@ -65,7 +77,8 @@ isr_first_digit:		; check the seconds digit
 	sec
 	sbc	#$01	
 	sta	(SCRN_LSB),y
-	jmp	isr_update_music
+
+	jmp	check_timer1
 	
 isr_first_wrap_around:
 	inc	NUM_WRAPS
@@ -81,7 +94,8 @@ isr_first_wrap_around:
 	sec
 	sbc	#$01
 	sta	(SCRN_LSB),y
-	jmp	isr_update_music
+
+	jmp	check_timer1
 	
 isr_second_wrap_around:	
 	inc	NUM_WRAPS
@@ -97,7 +111,8 @@ isr_second_wrap_around:
 	sec
 	sbc	#$01
 	sta	(SCRN_LSB),y
-	jmp	isr_update_music
+
+	jmp	check_timer1
 
 isr_third_wrap_around:
 	inc	NUM_WRAPS
@@ -109,7 +124,8 @@ isr_third_wrap_around:
 	sta	NUM_WRAPS	
 	lda	#NUM_NINE
 	sta	(SCRN_LSB),y
-	jmp	isr_update_music
+
+	jmp	check_timer1
 
 isr_trigger_end_game:
 	;; reset timer to ZERO since wrap around for first
@@ -122,12 +138,16 @@ isr_trigger_end_game:
 	
 	lda	#$0
 	sta	GAME_STATUS
-	jmp 	isr_done_timer2
-	
-isr_update_music:	; ~~~ 15ce
+
+	jmp	check_timer1
+
+;;; **** ISR : next_note
+;;;      This ISR grabs the next note for each voice when timer 2 runs out
+;;;  	 If the timer hasn't run out yet, modulate the note instead
+isr_update_music:
 	dec	S1_DUR		; single sixteenth note has passed
-	bne	isr_check_S3	; if not zero, don't change the note and check next voice
-isr_change_S1:	
+	bne	check_S3	; if not zero, don't change the note and check next voice
+change_S1:	
 	;; move the S1 pointer to the next note
 	ldx	S1_INDEX
 	inx
@@ -135,7 +155,7 @@ isr_change_S1:
 	inx
 	lda	S1NOTES,X
 	cmp	#$ff
-	beq 	isr_done_song
+	beq 	done_song
 	stx	S1_INDEX
 
 	;; get duration for new note
@@ -144,10 +164,10 @@ isr_change_S1:
 	inx
 	lda	S1NOTES,X
 	sta	S1_DUR
-isr_check_S3:
+check_S3:
 	dec	S3_DUR
-	bne 	modulate	; all voices checked; done
-isr_change_S3:			; else, change S3 note
+	bne 	done_notes	; all voices checked; done
+change_S3:			; else, change S3 note
 	;; move the S3 pointer to the next note
 	ldx	S3_INDEX
 	inx
@@ -162,10 +182,16 @@ isr_change_S3:			; else, change S3 note
 	inx
 	lda	S3NOTES,X
 	sta	S3_DUR
-
+done_notes:			; we have checked all the notes
+	;;  restart the timer
+	lda	#SIXT_L
+	sta	TIMER1_L	
+	lda	#SIXT_H
+	sta	TIMER1_H	; STARTS the timer and clears the interrupt request
+	
 	jmp	modulate	; modulate the notes
 
-isr_done_song:
+done_song:
 	;; restart the song from the beginning
 	lda	#0
 	sta	S1_INDEX
@@ -177,8 +203,13 @@ isr_done_song:
 	lda	S3NOTES + 2
 	sta	S3_DUR
 
-	jmp 	done_mod
+	;;  restart the timer
+	lda	#SIXT_L
+	sta	TIMER1_L	
+	lda	#SIXT_H
+	sta	TIMER1_H	; STARTS the timer and clears the interrupt request
 
+	jmp 	done_mod
 modulate:			; modulate the notes
 	lda	MOD_FLAG
 	beq	zero_mod
@@ -198,15 +229,8 @@ done_mod:
 	ldx	S3_INDEX
 	lda	S3NOTES,X
 	sta	S3
-
-isr_done_timer2:
-	pla
-	tay			; restore old Y
-	pla
-	tax			; restore old X
-	pla			; restore old A
 	
-	jmp	OLD_IRQ
+	jmp	done_interrupt
 
 add_mod:
 	inx
