@@ -33,8 +33,29 @@ check_timer2:
 check_timer1:	
 	lda	VIA_FLAGS
 	and	#$40		; check TIMER1 bit ($40 = 0100 0000)
-	beq	done_interrupt  ; TIMER1 bit is not set either so done
+	beq	modulate        ; TIMER1 bit is not set either so modulate
 	jmp	isr_update_music
+
+modulate:			; modulate the notes
+	lda	MOD_FLAG
+	beq	zero_mod
+one_mod:			; currently pointing at second "mod" note
+	dec	MOD_FLAG	; change to zero mod
+	dec	S1_INDEX	; point at first "mod" note
+	dec	S3_INDEX
+	jmp	done_mod
+zero_mod:			; currently pointing at first  "mod" note
+	inc	MOD_FLAG	; change to one mod
+	inc	S1_INDEX	; point at second "mod" note
+	inc	S3_INDEX
+done_mod:
+	ldx	S1_INDEX
+	lda	S1NOTES,X
+	sta	S1		; load the new note and play it
+	ldx	S3_INDEX
+	lda	S3NOTES,X
+	sta	S3
+
 done_interrupt:	
 	pla
 	tay			; restore old Y
@@ -209,27 +230,8 @@ done_song:
 	sta	TIMER1_H	; STARTS the timer and clears the interrupt request
 
 	jmp 	done_mod
-modulate:			; modulate the notes
-	lda	MOD_FLAG
-	beq	zero_mod
-one_mod:			; currently pointing at second "mod" note
-	dec	MOD_FLAG	; change to zero mod
-	dec	S1_INDEX	; point at first "mod" note
-	dec	S3_INDEX
-	jmp	done_mod
-zero_mod:			; currently pointing at first  "mod" note
-	inc	MOD_FLAG	; change to one mod
-	inc	S1_INDEX	; point at second "mod" note
-	inc	S3_INDEX
-done_mod:
-	ldx	S1_INDEX
-	lda	S1NOTES,X
-	sta	S1		; load the new note and play it
-	ldx	S3_INDEX
-	lda	S3NOTES,X
-	sta	S3
-	
-	jmp	done_interrupt
+
+; --- SUBROUTINES
 
 add_mod:
 	inx
