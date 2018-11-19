@@ -36,8 +36,8 @@ QURT_NOTE = 16
 EIGT_NOTE = 8
 SIXT_NOTE = 4
 
-SIXT_L = $ff		; length of sixteenth note - low byte
-SIXT_H = $ff		; length of sixteenth note - high byte	
+SIXT_L = $24		; length of sixteenth note - low byte
+SIXT_H = $f4		; length of sixteenth note - high byte	
 	
 ;;; *** ZERO PAGE ***
 S1_INDEX  = $fa
