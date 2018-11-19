@@ -10,7 +10,7 @@ SCRN_MEM2         = $1f00   ; middle of screen memory
 CHAR_MEM          = $1c00   ; start of character memory
 
 SCRN_V            = $9001   ; vertical origin of the screen
-ROWS	            = $9003   ; bits 1-6: number of rows (ref: p 175)
+ROWS	          = $9003   ; bits 1-6: number of rows (ref: p 175)
 RASTER	          = $9004
 
 ;; The IRQ vector is the location (ISR) to jump when an interrupt happens
@@ -24,15 +24,14 @@ S3 	     	  = $900c
 S4 	     	  = $900d
 VOLUME       	  = $900e
 
-
 VIA_CONTROL       = $911b
 VIA_FLAGS         = $911d		; reference: page 218
 VIA_ENABLE        = $911e
 
-TIMER1_LOC        = $9114		; timer 1 low order counter
-TIMER1_HOC        = $9115		; timer 1 high order counter
-TIMER1_LOL        = $9116		; timer 1 low order latch
-TIMER1_HOL        = $9117		; timer 1 high order latch
+TIMER1_L     = $9114		; timer 1 low order byte
+TIMER1_H     = $9115		; timer 1 high order byte
+TIMER1_LTL   = $9116		; timer 1 low byte to load
+TIMER1_HTL   = $9117		; timer 1 high byte to load
 	
 TIMER2_L          = $9118		; timer 2 low order byte
 TIMER2_H          = $9119		; timer 2 high order byte
@@ -50,9 +49,9 @@ CHAR_BCKWARD      = #$06    ; E = character facing backward
 CHAR_RIGHT        = #$0a    ; I = character facing to the right
 CHAR_LEFT         = #$0e    ; M = character facing to the left
 TREE1             = #$12    ; Q = tree sprite  
-ITEM_LETTER	      = #$16    ; U = letter sprite
-NUM_ZERO	        = #$18    ; W = start of number 0
-NUM_NINE	        = #$21    ; SPACE = start of number 9 
+ITEM_LETTER	  = #$16    ; U = letter sprite
+NUM_ZERO	  = #$18    ; W = start of number 0
+NUM_NINE	  = #$21    ; SPACE = start of number 9 
 
 SPRITE_CHAR_COLOR = #$09   	; multi-colour white
 TREE_CHAR_COLOR   = #$0d   	; multi-colour green
@@ -65,11 +64,14 @@ SECOND_L	        = #$24    ; low  byte of $f906
 NUM_SEC		        = #$11    ; 1 MORE THAN how many ^ it takes for a single second
 
 ;; music stuff
-WHOL_NOTE = 8
-HALF_NOTE = 4
-QURT_NOTE = 2
-EIGT_NOTE = 1	
-SIXT_NOTE = 0
+WHOL_NOTE = 64
+HALF_NOTE = 32
+QURT_NOTE = 16
+EIGT_NOTE = 8	
+SIXT_NOTE = 4
+
+SIXT_L = $ff		; length of sixteenth note - low byte
+SIXT_H = $ff		; length of sixteenth note - high byte	
 
 CLEAR_CHAR        = 0
 
