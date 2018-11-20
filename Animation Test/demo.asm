@@ -267,7 +267,8 @@ right
 	lda	#CHAR_RIGHT
 	sta	CURR_SPRITE
 doneInput:
-
+	lda	#$00
+	sta	ANIMATE_STATUS
 	jsr	check_movement
 
 	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
