@@ -24,6 +24,10 @@ TODO:
 Maybes
 - text box (e.g. 'You here some rustling')
 - add slenderman
+- cheat codes
+  - code that will show the maze
+  - code that will teleport player to the letter
+  - etc.
 
 Possible Optimizations:
 - use same add/subOffset macro/routines
