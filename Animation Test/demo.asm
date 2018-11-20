@@ -228,12 +228,14 @@ continue_game:
 	beq right
 
 	jmp input
-up:
+up:	
 	jsr	erase
 	ldy #22
 	jsr subSpriteOffset
 	dec	SPRITE_Y
-
+	
+	lda	#$00
+	sta	ANIMATE_STATUS	
 	lda	#CHAR_BCKWARD
 	sta	CURR_SPRITE
 	
@@ -265,6 +267,7 @@ right
 	lda	#CHAR_RIGHT
 	sta	CURR_SPRITE
 doneInput:
+
 	jsr	check_movement
 
 	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
@@ -282,3 +285,4 @@ end_game:
 	INCLUDE	"interrupts.asm"
 	INCLUDE "sprites.asm"
 	INCLUDE "music.asm"
+

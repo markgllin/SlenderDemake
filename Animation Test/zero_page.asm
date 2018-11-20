@@ -65,4 +65,4 @@ S3_DUR    	  = $39
 MOD_FLAG  	  = $3a
 
 ANIMATE_COUNT     = $3b
-ANIMATE_STATUS    = $3c
+ANIMATE_STATUS    = $3d

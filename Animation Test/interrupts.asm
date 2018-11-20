@@ -88,8 +88,8 @@ isr_update_timer:
 	lda	#NUM_SEC	; reload counter
 	sta	TIMER_CTR
 
-	jmp	animate_sprite
-
+	jsr	animate_sprite
+	
 isr_first_digit:		; check the seconds digit
 	ldy	#$03
 	lda	(SCRN_LSB),y
@@ -274,4 +274,4 @@ draw_animate:
 	lda	#ANIMATION_DELAY
 	sta	ANIMATE_COUNT
 done_animate:
-	jmp	isr_first_digit
+	rts
