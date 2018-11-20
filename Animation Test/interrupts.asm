@@ -88,7 +88,7 @@ isr_update_timer:
 	lda	#NUM_SEC	; reload counter
 	sta	TIMER_CTR
 
-	jsr	animate_sprite
+	jmp	animate_sprite
 
 isr_first_digit:		; check the seconds digit
 	ldy	#$03
@@ -266,4 +266,4 @@ animate_open:
 	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
 
 done_animate:
-	rts
+	jmp	isr_first_digit
