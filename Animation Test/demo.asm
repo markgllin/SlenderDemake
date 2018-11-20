@@ -55,14 +55,24 @@ copy_blank2_debug:
 	jsr     clr
 	jsr     generateMaze
 
-	;; now, load the sprites into memory
+	;; now, load the sprites into memory - total bytes = (9 * 32) + 16 = 304 = $130
+	;; character sprites = first 256 bytes
 	ldx	#00
 copy_sprites:
 	lda	sprite,X
   	sta	SPRITE_ADDRESS,X	
   	inx
-  	cpx	#208
   	bne	copy_sprites
+	
+	;; copy remaining 48 bytes
+	ldx 	#00
+copy_others: 				
+	lda	tree1,X
+	sta	SPRITE_ADDRESS+256,X
+	inx
+	cpx	#$30			; 48
+	bne	copy_others
+
 
 	;; copy the numbers from memory
 	;; a.k.a copy starting from $8000 + ($30 * 8) = $8000 + $180 = $8180
@@ -113,7 +123,8 @@ init_all_the_things:
 
 	lda	#ANIMATION_DELAY
 	sta	ANIMATE_COUNT
-
+	lda	#$00
+	sta	ANIMATE_STATUS
 
 	;; init all the music things
 	lda	#0

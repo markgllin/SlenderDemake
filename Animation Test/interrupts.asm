@@ -244,26 +244,34 @@ add_mod:
 animate_sprite:
 	dec	ANIMATE_COUNT 
 	bne	done_animate
-	lda	#ANIMATION_DELAY
-	sta	ANIMATE_COUNT
 
-	lda	CURR_SPRITE
-	cmp	#CHAR_FORWARD
-	bne	animate_open
-	
-animate_blink:
-	lda	#B_CHAR_FORWARD
-	sta	CURR_SPRITE
-	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
-	jmp	done_animate
+	lda	ANIMATE_STATUS
+	bne	animate_blink
 
 animate_open:
-	cmp	#B_CHAR_FORWARD
-	bne	done_animate
+	lda	#$ff
+	sta	ANIMATE_STATUS	
 
-	lda	#CHAR_FORWARD
+	lda	CURR_SPRITE
+	clc
+	adc	#$10
 	sta	CURR_SPRITE
+
+	jmp	draw_animate
+
+animate_blink:
+	lda	#$00
+	sta	ANIMATE_STATUS
+
+	lda	CURR_SPRITE
+	sec
+	sbc	#$10
+	sta	CURR_SPRITE
+
+draw_animate:
 	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
 
+	lda	#ANIMATION_DELAY
+	sta	ANIMATE_COUNT
 done_animate:
 	jmp	isr_first_digit

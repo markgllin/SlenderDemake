@@ -39,8 +39,7 @@ TIMER2_H          = $9119		; timer 2 high order byte
 ;;; CUSTOM CHARSET ADDRESSES
 SPACE_ADDRESS     = $1c00   ; where the space character starts
 SPRITE_ADDRESS    = $1c10		; where the sprites start
-NUMBERS_ADDRESS   = $1ce0		; where numbers start in custom charset
-	
+NUMBERS_ADDRESS   = $1d40		; where numbers start in custom charset
 
 
 ;;; ---- CONSTANTS
@@ -50,10 +49,13 @@ CHAR_BCKWARD      = #$06    ; F = character facing backward
 CHAR_RIGHT        = #$0a    ; J = character facing to the right
 CHAR_LEFT         = #$0e    ; N = character facing to the left
 B_CHAR_FORWARD    = #$12    ; R = character facing forward - blinking
-TREE1             = #$16    ; V = tree sprite  
-ITEM_LETTER	  = #$1a    ; Z = letter sprite
-NUM_ZERO	  = #$1c    ; £ = start of number 0
-NUM_NINE	  = #$25    ; % = start of number 9 
+B_CHAR_BCKWARD    = #$16    ; V = character facing backward - blinking  
+B_CHAR_RIGHT      = #$1a    ; Z = character facing right - blinking
+B_CHAR_LEFT       = #$1e    ; UP = character facing left - blinking
+TREE1             = #$22    ; " = tree sprite  
+ITEM_LETTER	  = #$26    ; & = letter sprite
+NUM_ZERO	  = #$28    ; ( = start of number 0
+NUM_NINE	  = #$31    ; 1 = start of number 9 
 
 SPRITE_CHAR_COLOR = #$09   	; multi-colour white
 TREE_CHAR_COLOR   = #$0d   	; multi-colour green
