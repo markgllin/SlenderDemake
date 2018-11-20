@@ -11,7 +11,7 @@ TODO:
 - multiple rooms
 
 - ~~collision detection~~
-- title screen
+- title screen - in progress
 - end game screen
 - ~~score~~
 
@@ -19,7 +19,7 @@ TODO:
 
 - ~~timer~~
 - flashlight effect - in progress
-- sprite animations - in progress
+- ~~sprite animations~~
 
 Maybes
 - text box (e.g. 'You here some rustling')
