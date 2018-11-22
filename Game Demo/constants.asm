@@ -98,8 +98,8 @@ WEST              = 4
 PATH              = 1
 
 CLEAR_CHAR_TL     = 2
-CLEAR_CHAR_TR     = 3
-CLEAR_CHAR_BL     = 4
+CLEAR_CHAR_TR     = 4
+CLEAR_CHAR_BL     = 3
 CLEAR_CHAR_BR     = 5
 
 SCAN_KEYBOARD     = $c5

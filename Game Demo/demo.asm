@@ -1,3 +1,5 @@
+	
+	;https://github.com/Heenawter/SlenderDemake/commit/17158cc297ecb9b3010436f53256e0f314f66cb2
 	processor	6502
 
 	INCLUDE	"constants.asm"
@@ -37,9 +39,9 @@ copy_blank:
 	cpx	#48
 	bne	copy_blank
 
-;; COMMENT out copy_blank and uncomment copy_blank_debug
-;; and copy_blank2_debug to debug with maze visible
-;; copy_blank3_debug is only for seeing area beyond path - can ignore for the most part
+; ; COMMENT out copy_blank and uncomment copy_blank_debug
+; ; and copy_blank2_debug to debug with maze visible
+; ; copy_blank3_debug is only for seeing area beyond path - can ignore for the most part
 ; copy_blank_debug:
 ; 	sta	SPACE_ADDRESS,X
 ; 	inx
@@ -53,7 +55,7 @@ copy_blank:
 ; 	cpx	#16
 ; 	bne	copy_blank2_debug
 
-; 	lda	#$ff
+; 	lda	#$00
 ; copy_blank3_debug:
 ; 	sta	SPACE_ADDRESS,X
 ; 	inx
@@ -163,18 +165,12 @@ init_score_loop:
 	cpy	#$16
 	bne	init_score_loop
 	
-draw_tree:
-	lda	#$e6		; offset tree
-	sta	TREE_LSB
-	sta	TREE_CLR_LSB
-	
 	lda	#TREE_CHAR_COLOR
 	sta	CURR_CLR
 	sta TREE_CLR
 	lda	#TREE1
 	sta	CURR_SPRITE
 	sta TREE_SPRITE
-	draw_char TREE_SPRITE, TREE_CLR, TREE_CLR_LSB, TREE_LSB
 	
 draw_sprite2:
 	lda	#$35		; offset sprite
@@ -259,7 +255,7 @@ right
 doneInput:
 	jsr	check_movement
 	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
-	; jsr draw_env
+	jsr draw_env
 	jmp	input
 
 ;;; ----- END GAME
