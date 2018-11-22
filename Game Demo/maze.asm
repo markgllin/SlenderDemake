@@ -106,6 +106,7 @@ doneMaze subroutine
   sta MAZE_MSB
   jsr drawPath
 
+  jsr maskTrees
   rts
 
 backtrack subroutine
@@ -238,4 +239,93 @@ drawCell subroutine
   sta (MAZE_LSB),y
   rts
 
-  ;include "common_subroutines.asm"
+maskTrees subroutine
+  lda #0
+  sta MAZE_X_COORD
+  sta MAZE_Y_COORD
+
+  lda #$00         ; load LSB
+  sta MAZE_LSB
+
+  lda #$1e         ; load MSB
+  sta MAZE_MSB
+
+.drawTopLeft
+  ldy #0
+
+  lda (MAZE_LSB),y
+  cmp #1
+  beq .drawTopRight
+  lda #CLEAR_CHAR_TL
+  sta (MAZE_LSB),y
+.drawTopRight
+  iny
+
+  lda (MAZE_LSB),y
+  cmp #1
+  beq .drawBottomLeft
+
+  lda #CLEAR_CHAR_TR
+  sta (MAZE_LSB),y
+
+.drawBottomLeft
+  TYA
+  CLC
+  adc #21
+  TAY
+
+  lda (MAZE_LSB),y
+  cmp #1
+  beq .drawBottomRight
+
+  lda #CLEAR_CHAR_BL
+  sta (MAZE_LSB),y
+.drawBottomRight
+  iny
+
+  lda (MAZE_LSB),y
+  cmp #1
+  beq .drawNextBlock
+
+  lda #CLEAR_CHAR_BR
+  sta (MAZE_LSB),y
+
+.drawNextBlock
+  TYA
+  CLC
+  adc #2
+  TAY
+  lda MAZE_LSB
+  ldx #2
+  stx OFFSET
+  ldx MAZE_MSB
+  jsr addOffset
+  sta MAZE_MSB
+  lda LSB
+  sta MAZE_LSB
+
+  inc_maze_coord MAZE_X_COORD, #2
+  cmp #RGHT_SCRN_BNDRY
+  bcs .doneRow
+  sta MAZE_X_COORD
+  jmp .drawTopLeft
+.doneRow
+  inc_maze_coord MAZE_Y_COORD, #2
+  cmp #BTM_SCRN_BNDRY
+  bcs .doneDrawing
+  sta MAZE_Y_COORD
+  lda #0
+  sta MAZE_X_COORD
+
+  lda MAZE_LSB
+  ldx #22
+  stx OFFSET
+  ldx MAZE_MSB
+  jsr addOffset
+  sta MAZE_MSB
+  lda LSB
+  sta MAZE_LSB
+
+  jmp .drawTopLeft
+.doneDrawing
+  rts
