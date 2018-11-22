@@ -74,7 +74,7 @@ draw_env: subroutine
 applyMask subroutine
 	lda SPRITE_Y					; boundary check for entrance and exit of maze
 	cmp #9
-	beq .checkSpriteX			; (4,9) and (20,9) are the boundaries for drawing trees
+	beq .checkSpriteX			; (3,9) and (20,9) are the boundaries for drawing trees
 .drawAllSegments				; otherwise, trees will wrap around screen
 	ldx	TREE_SPRITE
 	ldy	#$00
@@ -88,7 +88,7 @@ applyMask subroutine
 	rts
 .checkSpriteX
 	lda SPRITE_X					
-	cmp #4
+	cmp #3
 	bmi .doneDrawing
 	cmp #20
 	bcs .doneDrawing
