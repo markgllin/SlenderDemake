@@ -12,12 +12,14 @@
 end:	dc.w	0
 
 	;; set up the interrupts
-	jsr	timer2_IRQ	
+	jsr	timer_IRQ	
 start:
 	lda	#14	; border blue, screen black (ref p. 265)
-	sta SCR_C
-	lda	#112	; yellow = first byte 7 (ref p. 264)
-			; 112 = 0111 0000 where 111 = 7
+	sta     SCR_C
+	lda	#$7f	; yellow = first four bits = 7 (ref p. 264)
+                  	; volume = other four bits = f
+			; 7f = 0111 1111 where 111 = 7 and 1111 = f
+			
 	sta	AUX_C
 	lda	#01	; white characters
 	sta	CHR_C
@@ -62,13 +64,13 @@ copy_blank:
 	jsr generateMaze
 
 	;; now, load the sprites into memory
-  ldx	#00
+	ldx	#00
 copy_sprites:
 	lda	sprite,X
-  sta	SPRITE_ADDRESS,X	
-  inx
-  cpx	#176
-  bne	copy_sprites
+  	sta	SPRITE_ADDRESS,X	
+  	inx
+  	cpx	#176
+  	bne	copy_sprites
 
 	;; copy the numbers from memory
 	;; a.k.a copy starting from $8000 + ($30 * 8) = $8000 + $180 = $8180
@@ -114,9 +116,25 @@ init_all_the_things:
 	sta	SPRITE_X
 	lda	#$ff
 	sta	GAME_STATUS
-	lda #SEED		; init the SEEEED for RNG
-	sta LFSR
-	
+	lda 	#SEED		; init the SEEEED for RNG
+	sta 	LFSR
+
+	;; init all the music things
+	lda	#0
+	sta	S1_INDEX
+	sta	S3_INDEX
+	sta	MOD_FLAG
+
+	lda	S1NOTES + 2
+	sta	S1_DUR
+	lda	S3NOTES + 2
+	sta	S3_DUR
+
+	lda	S1NOTES
+	sta	S1
+	lda	S3NOTES
+	sta	S3	
+
 	;; initialize the timer to 0300
 	ldy	#$0
 init_timer_loop:	
@@ -175,7 +193,12 @@ start_timer:
 	lda	SECOND_L
 	sta	TIMER2_L
 	lda	SECOND_H
-	sta	TIMER2_H	; STARTS the timer
+	sta	TIMER2_H	; STARTS the timer 2
+
+	lda	#SIXT_L
+	sta	TIMER1_L
+	lda	#SIXT_H
+	sta	TIMER1_H	; STARTS the timer 1
 	
 ;;; ----- INPUT
 input:
@@ -249,3 +272,4 @@ end_game:
 	INCLUDE	"movement.asm"
 	INCLUDE	"interrupts.asm"
 	INCLUDE "sprites.asm"
+	INCLUDE "music.asm"

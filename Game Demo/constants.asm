@@ -10,7 +10,7 @@ SCRN_MEM2         = $1f00   ; middle of screen memory
 CHAR_MEM          = $1c00   ; start of character memory
 
 SCRN_V            = $9001   ; vertical origin of the screen
-ROWS	            = $9003   ; bits 1-6: number of rows (ref: p 175)
+ROWS	          = $9003   ; bits 1-6: number of rows (ref: p 175)
 RASTER	          = $9004
 
 ;; The IRQ vector is the location (ISR) to jump when an interrupt happens
@@ -18,14 +18,20 @@ IRQ_L             = $0314		; low byte of IRQ vector
 IRQ_H             = $0315		; high byte of IRQ vector 
 OLD_IRQ           = $eabf
 	
+S1 	     	  = $900a 		; reference: page 96
+S2 	     	  = $900b
+S3 	     	  = $900c
+S4 	     	  = $900d
+VOLUME       	  = $900e
+
 VIA_CONTROL       = $911b
 VIA_FLAGS         = $911d		; reference: page 218
 VIA_ENABLE        = $911e
 
-TIMER1_LOC        = $9114		; timer 1 low order counter
-TIMER1_HOC        = $9115		; timer 1 high order counter
-TIMER1_LOL        = $9116		; timer 1 low order latch
-TIMER1_HOL        = $9117		; timer 1 high order latch
+TIMER1_L     = $9114		; timer 1 low order byte
+TIMER1_H     = $9115		; timer 1 high order byte
+TIMER1_LTL   = $9116		; timer 1 low byte to load
+TIMER1_HTL   = $9117		; timer 1 high byte to load
 	
 TIMER2_L          = $9118		; timer 2 low order byte
 TIMER2_H          = $9119		; timer 2 high order byte
@@ -38,6 +44,7 @@ NUMBERS_ADDRESS   = $1ce0		; where numbers start in custom charset
 
 ;;; ---- CONSTANTS
 SPACE             = #$00    ; @
+
 CHAR_FORWARD      = #$06    ; A = character facing forward
 CHAR_BCKWARD      = #$0a    ; E = character facing backward
 CHAR_RIGHT        = #$0e    ; I = character facing to the right
@@ -56,6 +63,16 @@ TREE_CHAR_COLOR   = #$0d   	; multi-colour green
 SECOND_H	        = #$f4    ; high byte of $f906
 SECOND_L	        = #$24    ; low  byte of $f906
 NUM_SEC		        = #$11    ; 1 MORE THAN how many ^ it takes for a single second
+
+;; music stuff
+WHOL_NOTE = 64
+HALF_NOTE = 32
+QURT_NOTE = 16
+EIGT_NOTE = 8	
+SIXT_NOTE = 4
+
+SIXT_L = $ff		; length of sixteenth note - low byte
+SIXT_H = $ff		; length of sixteenth note - high byte	
 
 CLEAR_CHAR        = 0
 
