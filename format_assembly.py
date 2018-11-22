@@ -4,7 +4,7 @@ import os
 import sys
 
 root_dir = "./" + sys.argv[1] + "/"
-print("Formatting all the files in " + root_dir + "...")
+print("Formatting all the files in " + root_dir + " ...")
 
 for directory, subdirectories, files in os.walk(root_dir):
    for file in files:

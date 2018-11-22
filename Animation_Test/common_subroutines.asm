@@ -1,7 +1,7 @@
 ; COMMON SUBROUTINES
 
 ;clears screen
-clr             subroutine
+clr:            subroutine
         lda     #CLEAR_CHAR
         ldx     #0
 .clrloop:
@@ -14,7 +14,7 @@ clr             subroutine
 ; random value returned in accumulator
 ; and stored in LFSR (mem address)
 ; alters Y register and accumulator
-random          subroutine
+random:         subroutine
         lda     LFSR
         ldy     LFSR
         lsr     LFSR
@@ -38,7 +38,7 @@ random          subroutine
 ; needs offset in OFFSET
 ; returns values in OFFSET, LSB, AND MSB
 ; also returns MSB accumulator
-addOffset       subroutine
+addOffset:      subroutine
         clc                     ; clear the carry
         adc     OFFSET          ; add to LSB
         sta     LSB             ; store result in LSB
@@ -51,7 +51,7 @@ addOffset       subroutine
 ; needs offset in OFFSET
 ; returns values in OFFSET, LSB, AND MSB
 ; also returns MSB accumulator
-subOffset       subroutine
+subOffset:      subroutine
         sec
         sbc     OFFSET
         sta     LSB
@@ -61,7 +61,7 @@ subOffset       subroutine
         rts
 
 
-startFrame      subroutine
+startFrame:     subroutine
         lda     #$00
         sta     FRAME
 .frame:

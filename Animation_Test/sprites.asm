@@ -1,4 +1,4 @@
-d       ;;; ----- DRAWING ROUTINES
+        ;;; ----- DRAWING ROUTINES
 
 place_letter:
         lda     LFSR
