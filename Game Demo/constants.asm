@@ -32,20 +32,20 @@ TIMER2_H          = $9119		; timer 2 high order byte
 
 ;;; CUSTOM CHARSET ADDRESSES
 SPACE_ADDRESS     = $1c00   ; where the space character starts
-SPRITE_ADDRESS    = $1c10		; where the sprites start
-NUMBERS_ADDRESS   = $1cc0		; where numbers start in custom charset
+SPRITE_ADDRESS    = $1c30		; where the sprites start
+NUMBERS_ADDRESS   = $1ce0		; where numbers start in custom charset
 	
 
 ;;; ---- CONSTANTS
 SPACE             = #$00    ; @
-CHAR_FORWARD      = #$02    ; A = character facing forward
-CHAR_BCKWARD      = #$06    ; E = character facing backward
-CHAR_RIGHT        = #$0a    ; I = character facing to the right
-CHAR_LEFT         = #$0e    ; M = character facing to the left
-TREE1             = #$12    ; Q = tree sprite  
-ITEM_LETTER	      = #$16    ; U = letter sprite
-NUM_ZERO	        = #$18    ; W = start of number 0
-NUM_NINE	        = #$21    ; SPACE = start of number 9 
+CHAR_FORWARD      = #$06    ; A = character facing forward
+CHAR_BCKWARD      = #$0a    ; E = character facing backward
+CHAR_RIGHT        = #$0e    ; I = character facing to the right
+CHAR_LEFT         = #$12    ; M = character facing to the left
+TREE1             = #$16    ; Q = tree sprite  
+ITEM_LETTER	      = #$1a    ; U = letter sprite
+NUM_ZERO	        = #$1c    ; W = start of number 0
+NUM_NINE	        = #$25    ; SPACE = start of number 9 
 
 SPRITE_CHAR_COLOR = #$09   	; multi-colour white
 TREE_CHAR_COLOR   = #$0d   	; multi-colour green
@@ -79,6 +79,11 @@ SOUTH             = 2
 EAST              = 3 
 WEST              = 4 
 PATH              = 1
+
+CLEAR_CHAR_TL     = 2
+CLEAR_CHAR_TR     = 3
+CLEAR_CHAR_BL     = 4
+CLEAR_CHAR_BR     = 5
 
 SCAN_KEYBOARD     = $c5
 W_KEY             = 9

@@ -32,11 +32,12 @@ start:
 copy_blank:
 	sta	SPACE_ADDRESS,X
 	inx
-	cpx	#16
+	cpx	#48
 	bne	copy_blank
 
 ;; COMMENT out copy_blank and uncomment copy_blank_debug
 ;; and copy_blank2_debug to debug with maze visible
+;; copy_blank3_debug is only for seeing area beyond path - can ignore for the most part
 ; copy_blank_debug:
 ; 	sta	SPACE_ADDRESS,X
 ; 	inx
@@ -49,6 +50,13 @@ copy_blank:
 ; 	inx
 ; 	cpx	#16
 ; 	bne	copy_blank2_debug
+
+; 	lda	#$ff
+; copy_blank3_debug:
+; 	sta	SPACE_ADDRESS,X
+; 	inx
+; 	cpx	#48
+; 	bne	copy_blank3_debug
 
 	jsr clr
 	jsr generateMaze
