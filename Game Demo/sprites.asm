@@ -108,19 +108,19 @@ treeSegments    subroutine
         beq     .drawBR
         rts
 .drawTL
-        ldx     #(CLEAR_CHAR_TL+36)
+        ldx     #(CLEAR_CHAR_TL+OFFSET_TO_TREES)
         draw_sprite TREE_CLR, TREE_CLR_LSB, TREE_LSB
         rts
 .drawTR
-        ldx     #(CLEAR_CHAR_TR+36)
+        ldx     #(CLEAR_CHAR_TR+OFFSET_TO_TREES)
         draw_sprite TREE_CLR, TREE_CLR_LSB, TREE_LSB
         rts
 .drawBL
-        ldx     #(CLEAR_CHAR_BL+36)
+        ldx     #(CLEAR_CHAR_BL+OFFSET_TO_TREES)
         draw_sprite TREE_CLR, TREE_CLR_LSB, TREE_LSB
         rts
 .drawBR
-        ldx     #(CLEAR_CHAR_BR+36)
+        ldx     #(CLEAR_CHAR_BR+OFFSET_TO_TREES)
         draw_sprite TREE_CLR, TREE_CLR_LSB, TREE_LSB
         rts
 

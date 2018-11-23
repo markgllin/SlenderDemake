@@ -9,6 +9,7 @@ SCRN_MEM1       = $1e00         ; start of screen memory
 SCRN_MEM2       = $1f00         ; middle of screen memory
 CHAR_MEM        = $1c00         ; start of character memory
 
+SCRN_H          = $9000		; horizontal origin of the screen
 SCRN_V          = $9001         ; vertical origin of the screen
 ROWS            = $9003         ; bits 1-6: number of rows (ref: p 175)
 RASTER          = $9004
@@ -101,6 +102,8 @@ MAZE_ENTRANCE_MSB = #$1e
 MAZE_EXIT_LSB   = #$dc
 MAZE_EXIT_MSB   = #$1e
 
+OFFSET_TO_TREES = #36
+
 NORTH           = 1
 SOUTH           = 2
 EAST            = 3
@@ -117,5 +120,12 @@ W_KEY           = 9
 A_KEY           = 17
 S_KEY           = 41
 D_KEY           = 18
+SPACE_KEY	= 32
 
 SEED            = 50            ; can be anything but 0
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;          START SCREEN                ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ALPHABET_ROM    = $8001

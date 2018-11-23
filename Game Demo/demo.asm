@@ -12,7 +12,11 @@
 end:
         dc.w    0
 
+	lda     #255            ; custom character set
+        sta     $9005
+
         ;; set up the interrupts
+	jsr	start_screen
         jsr     timer_IRQ
 start:
         lda     #14             ; border blue, screen black (ref p. 265)
@@ -24,9 +28,6 @@ start:
         sta     AUX_C
         lda     #01             ; white characters
         sta     CHR_C
-
-        lda     #255            ; custom character set
-        sta     $9005
 
         ;; load zeros into the "0" character of our custom charset
         ldx     #$00
@@ -285,3 +286,4 @@ end_game:
         INCLUDE "interrupts.asm"
         INCLUDE "sprites.asm"
         INCLUDE "music.asm"
+	INCLUDE "start_screen.asm"
