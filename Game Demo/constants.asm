@@ -86,9 +86,12 @@ Y_OFFSET          = 22
 
 MAZE_ORIGIN       = 94
 
-MAZE_ENTRANCE_LSB = #$dc
+MAZE_ENTRANCE_Y_COORD = 9
+MAZE_ENTRANCE_X_COORD = 21
+MAZE_EXIT_X_COORD = 1
+MAZE_ENTRANCE_LSB = #$f0
 MAZE_ENTRANCE_MSB = #$1e
-MAZE_EXIT_LSB     = #$f0
+MAZE_EXIT_LSB     = #$dc
 MAZE_EXIT_MSB     = #$1e
 
 NORTH             = 1 
@@ -108,4 +111,4 @@ A_KEY             = 17
 S_KEY             = 41
 D_KEY             = 18
 
-SEED              = 240     ; can be anything but 0
+SEED              = 50     ; can be anything but 0

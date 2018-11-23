@@ -107,6 +107,7 @@ doneMaze subroutine
   jsr drawPath
 
   jsr maskTrees
+	jsr place_letter
   rts
 
 backtrack subroutine
@@ -328,4 +329,42 @@ maskTrees subroutine
 
   jmp .drawTopLeft
 .doneDrawing
+  rts
+
+checkDoorways subroutine
+  lda SPRITE_Y
+  cmp #MAZE_ENTRANCE_Y_COORD
+  bne .keepMaze
+.checkEntrance
+  lda SPRITE_X
+  cmp #22
+  beq .newMazeRight
+.checkExit
+  cmp #0
+  bne .keepMaze
+.newMazeLeft
+  lda #MAZE_ENTRANCE_X_COORD
+  sta SPRITE_X
+
+  lda #MAZE_ENTRANCE_LSB
+  sta SPRITE_LSB
+  sta SPRITE_CLR_LSB
+  
+  lda #MAZE_ENTRANCE_MSB
+  sta SPRITE_MSB
+  jmp .makeMaze
+.newMazeRight
+  lda #MAZE_EXIT_X_COORD
+  sta SPRITE_X
+
+  lda #MAZE_EXIT_LSB
+  sta SPRITE_LSB
+  sta SPRITE_CLR_LSB
+
+  lda #MAZE_EXIT_MSB
+  sta SPRITE_MSB
+.makeMaze
+  jsr clr
+  jsr generateMaze
+.keepMaze
   rts

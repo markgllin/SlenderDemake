@@ -72,3 +72,15 @@ startFrame subroutine
 	cmp	#$15		; add delay
 	bne	.frame
 	rts
+
+; displays player coordinates in bottom left corner
+debugCoordinates
+	lda SPRITE_X
+	CLC
+	adc #NUM_ZERO
+	sta 8164
+	lda SPRITE_Y
+	CLC
+	adc #NUM_ZERO
+	sta 8165
+	rts

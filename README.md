@@ -8,7 +8,7 @@ TODO:
   That is honestly a pretty minor detail though; more just annoying work than an actual hard thing. 
   Once game is closer to being "done" we can focus on this.
   
-- multiple rooms
+- multiple rooms - in progress
 
 - ~~collision detection~~
 - title screen - in progress
@@ -18,7 +18,7 @@ TODO:
   Also (technically) working but the code does NOT account for the max score of 9900. BUT is this even necessary? That would mean collecting 99 letters... I really doubt (in the real game) that would happen. So I don't see a point adding this check if we just make sure it never happens! Is there a difference between just lazy coding and efficient coding? :P
 
 - ~~timer~~
-- flashlight effect - in progress
+- ~~flashlight effect~~
 - ~~sprite animations~~
 
 Maybes

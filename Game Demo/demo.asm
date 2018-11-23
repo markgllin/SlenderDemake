@@ -1,5 +1,3 @@
-	
-	;https://github.com/Heenawter/SlenderDemake/commit/17158cc297ecb9b3010436f53256e0f314f66cb2
 	processor	6502
 
 	INCLUDE	"constants.asm"
@@ -182,8 +180,6 @@ draw_sprite2:
 	lda	#CHAR_FORWARD
 	sta	CURR_SPRITE
 	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
-
-	jsr place_letter
 	
 start_timer:
 	lda	SECOND_L
@@ -243,6 +239,7 @@ left:
 
 	lda	#CHAR_LEFT
 	sta	CURR_SPRITE
+	jsr checkDoorways
 	jmp doneInput
 right
 	jsr erase
@@ -252,10 +249,12 @@ right
 	
 	lda	#CHAR_RIGHT
 	sta	CURR_SPRITE
+	jsr checkDoorways
 doneInput:
 	jsr	check_movement
+	;jsr debugCoordinates
 	draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
-	jsr draw_env
+	jsr draw_env	
 	jmp	input
 
 ;;; ----- END GAME
