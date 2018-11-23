@@ -286,4 +286,4 @@ end_game:
         INCLUDE "interrupts.asm"
         INCLUDE "sprites.asm"
         INCLUDE "music.asm"
-	INCLUDE "start_screen.asm"
+	INCLUDE "start_screen.asm"  ;;; this MUST be last unless you want bad things to happen

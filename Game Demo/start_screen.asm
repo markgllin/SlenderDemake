@@ -1,10 +1,5 @@
 start_screen:
 	jsr	start_clr
-	;; position the screen
-	lda	#12
-	sta	SCRN_H	
-	lda	#40
-	sta	SCRN_V
 
 	lda     #8              ; border black, screen black (ref p. 265)
         sta     SCR_C
@@ -74,14 +69,44 @@ print_message:
 	cpx	#20
 	bne	print_message 
 
+
+	ldx	#00
+	ldy	#00
 start_input:
+	jsr	random
+	lda	LFSR
+	cmp	#248
+	bne	no_glitch
+	
+	jsr	glitch	
+
+no_glitch:
         lda     SCAN_KEYBOARD
         cmp     #SPACE_KEY
 	bne	start_input
 
 	rts
 
-;clears screen
+glitch:
+	lda	#10
+	sta	$04
+glitch_loop:
+	inc	SCRN_V
+	inc	SCRN_H
+	dec	$04
+	bne	glitch_loop
+
+	lda	#10
+	sta	$04
+glitch_undo:
+	dec	SCRN_V
+	dec	SCRN_H
+	dec	$04
+	bne	glitch_undo
+	
+	rts
+
+; special clear screen that clears ENTIRE screen
 start_clr:
         lda     #46
         ldx     #0
@@ -91,8 +116,16 @@ start_clr_loop:
         inx
         bne     start_clr_loop
         rts
-	
-	org 	$1c00
+
+message:		; "PRESS SPACE TO START"  -> 20 bytes
+	;   	P         R         E        S         S        
+	dc.b	16+#$180, 18+#$180, 5+#$180, 19+#$180, 19+#$180, #46
+	;	S         P         A        C        E
+	dc.b	19+#$180, 16+#$180, 1+#$180, 3+#$180, 5+#$180, #46
+	;   	T         O                S         T         A        R         T
+	dc.b	20+#$180, 15+#$180,   #46, 19+#$180, 20+#$180, 1+#$180, 18+#$180, 20+#$180
+
+	org 	$1c00		; naughty trick - just load right into custom character set
 logo:				; total: 45 characters = 360 bytes
 	; 1c00
 	dc.b 0,0,3,7,14,28,28,30		
@@ -141,11 +174,3 @@ logo:				; total: 45 characters = 360 bytes
 	dc.b 32,32,32,32,32,96,64,64		; 1d58
 	dc.b 0,0,0,0,0,0,0,220			; 1d60
 	dc.b 148,156,144,156,0,0,0,0		; 1d68
-
-message:		; "PRESS SPACE TO START"  -> 20 characters
-	;   	P         R         E        S         S        
-	dc.b	16+#$180, 18+#$180, 5+#$180, 19+#$180, 19+#$180, #46
-	;	S         P         A        C        E
-	dc.b	19+#$180, 16+#$180, 1+#$180, 3+#$180, 5+#$180, #46
-	;   	T         O                S         T         A        R         T
-	dc.b	20+#$180, 15+#$180,   #46, 19+#$180, 20+#$180, 1+#$180, 18+#$180, 20+#$180
