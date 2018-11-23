@@ -32,7 +32,6 @@ start:
         ;; load zeros into the "0" character of our custom charset
         ldx     #$00
         lda     #$00
-
 copy_blank:
         sta     SPACE_ADDRESS,X
         inx
@@ -73,7 +72,7 @@ copy_sprites:
         inx
         bne     copy_sprites
 
-        ;; copy remaining 48 bytes (tree and
+        ;; copy remaining 48 bytes (tree and letter)
         ldx     #00
 copy_others:
         lda     tree1,X
@@ -88,7 +87,7 @@ copy_others:
         ldx     #$0
 copy_numbers:
         lda     $8180,X         ; copy the source to the destination
-        sta     NUMBERS_ADDRESS,X; end of sprites
+        sta     NUMBERS_ADDRESS,X	; end of sprites
         inx
         cpx     #$50            ; copy characters 0-9
         bne     copy_numbers
@@ -101,34 +100,35 @@ init_all_the_things:
         sta     CLRM_LSB
         sta     SPRITE_CLR_LSB
 
-        lda     #$12
-        sta     SCORE_LSB
+        lda     #$12		; 4 characters away from right top corner
+        sta     SCORE_LSB	; position of the score on screen 
 
         lda     #$1e            ; load MSB
         sta     SCRN_MSB
         sta     SPRITE_MSB
         sta     SCORE_MSB
-        lda     #$1f
+        lda     #$1f		; ************** CHANGE THIS ****************
         sta     LETTER_MSB
 
         lda     #$96
         sta     CLRM_MSB
         sta     SPRITE_CLR_MSB
-        lda     #$97
+        lda     #$97		; ************** CHANGE THIS ****************
         sta     LETTER_CLR_MSB
 
-        ;; init all the other things
-        lda     #$00
-        sta     NUM_WRAPS
+	;; init the position of the sprite at spawn
         lda     #$01
         sta     SPRITE_Y
         lda     #$0a
         sta     SPRITE_X
+
+        ;; init all the other things
+        lda     #$00
+        sta     NUM_WRAPS
         lda     #$ff
         sta     GAME_STATUS
         lda     #SEED           ; init the SEEEED for RNG
         sta     LFSR
-
         lda     #ANIMATION_DELAY
         sta     ANIMATE_COUNT
         lda     #$00
@@ -153,10 +153,9 @@ init_all_the_things:
         ;; initialize the timer to 0300
         ldy     #$0
 init_timer_loop:
+	; font colour should still be white from start screen
         lda     #NUM_ZERO       ; number 0
         sta     (SCRN_LSB),y    ; position
-        lda     #$01            ; font color = white
-        sta     (CLRM_LSB),y
         iny
         cpy     #$04
         bne     init_timer_loop
@@ -169,11 +168,10 @@ init_timer_loop:
 
         ;; initialize the score
         ldy     #$12
-init_score_loop:
+init_score_loop: ;
+	; font colour should still be white from start screen
         lda     #NUM_ZERO
         sta     (SCRN_LSB),y
-        lda     #$01            ; font color = white
-        sta     (CLRM_LSB),y
         iny
         cpy     #$16
         bne     init_score_loop
@@ -185,7 +183,7 @@ init_score_loop:
         sta     CURR_SPRITE
         sta     TREE_SPRITE
 
-draw_sprite2:
+place_character_sprite:
         lda     #$35            ; offset sprite
         sta     SPRITE_LSB
         sta     SPRITE_CLR_LSB

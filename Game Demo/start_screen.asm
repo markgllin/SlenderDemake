@@ -106,7 +106,7 @@ glitch_undo:
 	
 	rts
 
-; special clear screen that clears ENTIRE screen
+; special clear screen that clears ENTIRE screen - just for start and end screens
 start_clr:
         lda     #46
         ldx     #0
@@ -174,3 +174,4 @@ logo:				; total: 45 characters = 360 bytes
 	dc.b 32,32,32,32,32,96,64,64		; 1d58
 	dc.b 0,0,0,0,0,0,0,220			; 1d60
 	dc.b 148,156,144,156,0,0,0,0		; 1d68
+

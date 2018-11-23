@@ -124,6 +124,7 @@ treeSegments    subroutine
         draw_sprite TREE_CLR, TREE_CLR_LSB, TREE_LSB
         rts
 
+
 ;;; ---- SPRITES AND STUFF
 sprite:
         ;;  sprite facing forward
