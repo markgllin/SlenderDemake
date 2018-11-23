@@ -1,5 +1,8 @@
         processor 6502
 
+	INCLUDE "constants.asm"
+        INCLUDE "zero_page.asm"
+
         org     $1001
 
         dc.w    end
@@ -8,46 +11,62 @@
 end:
         dc.w    0
 
-start:	jsr 	clr
+start:	jsr 	start_clr
 
 	lda     #255            ; custom character set
         sta     $9005
 
-	lda     #8              ; border black, screen black (ref p. 265)
-        sta     $900f
+	;; position the screen
+	lda	#12
+	sta	SCRN_H	
+	lda	#40
+	sta	SCRN_V
 
-	ldx	#00
+	lda     #8              ; border black, screen black (ref p. 265)
+        sta     SCR_C
+
+	ldx	#00		
 	lda	#01
-fill_colour_mem:
-	sta	$9600,x
-	sta	$9700,x
+fill_colour_mem:		; fill colour memory with white
+	sta	COLOR_MEM,x
+	sta	COLOR_MEM+#$ff,x
 	inx
 	bne	fill_colour_mem
 
 	ldx	#0
 copy_logo_256:			; copy first 255 bytes of logo
 	lda     logo,X
-        sta     $1c00,X
+        sta     CHAR_MEM,X
         inx
         bne     copy_logo_256
 
 	ldx	#0
 copy_remaining:			; copy the remaining bytes of the logo
 	lda	logo+256,X
-	sta	$1d00,X
+	sta	CHAR_MEM+#$100,X
 	inx
 	cpx	#$68		; remaining 104 bytes
 	bne	copy_remaining
-	
+
 	ldx	#00
 	lda	#00
 copy_blank_loop:		; make sure blank character is where it should be
-	sta	$1d70,X
+	sta	CHAR_MEM+#$170,X
 	inx	
 	cpx	#8
 	bne	copy_blank_loop
+	
+	ldx	#0
+copy_letters:
+	lda	ALPHABET_ROM,X
+	sta	CHAR_MEM+#$178,X
+	inx
+	cpx	#27
+	bne	copy_letters
+	
+;;;; now that copying is done, print that thing
 
-	;; store screen address for plotting	
+	;; store screen address MSB for plotting	
 	lda	#$1e
 	sta	$01
 
@@ -78,20 +97,97 @@ print_logo_column:
 	cpy	#9
 	bne	print_logo_row
 
+	ldx	#0
+print_message:
+	lda	message,X		; grab index for characters
+	sta	$1f35,X
+	inx
+	cpx	#20
+	bne	print_message 
+
+
+	ldx	#00
+	ldy	#00
+	lda	#40
+	sta	$03
+start_input:
+	iny
+	bne	no_wobble
+check_for_wobble:
+	dec	$03
+	bne	no_wobble
 	
-forever:
-	jmp	forever
+	lda	#40
+	sta	$03
+	jsr	wobble_screen
+
+no_wobble:
+	jsr	random
+	lda	LFSR
+	cmp	#248
+	bne	no_glitch
+	
+	jsr	glitch	
+
+no_glitch:
+        lda     SCAN_KEYBOARD
+        cmp     #SPACE_KEY
+	bne	start_input
+
+	rts
+
+wobble_screen:
+	jsr	startFrame
+	inx
+	cpx	#4
+	bmi	move_screen_down
+	cpx	#8
+	bmi	move_screen_up
+	jmp	reset
+move_screen_up:
+	dec	SCRN_V
+	jmp	done_wobble
+move_screen_down:
+	inc	SCRN_V
+	jmp	done_wobble
+reset:
+	lda	#40
+	sta	SCRN_V
+	ldx	#0
+done_wobble:
+	rts
+
+glitch:
+	lda	#10
+	sta	$04
+glitch_loop:
+	inc	SCRN_V
+	inc	SCRN_H
+	dec	$04
+	bne	glitch_loop
+
+	lda	#10
+	sta	$04
+glitch_undo:
+	dec	SCRN_V
+	dec	SCRN_H
+	dec	$04
+	bne	glitch_undo
+	
+	rts
 
 ;clears screen
-clr:            subroutine
+start_clr:
         lda     #46
         ldx     #0
-.clrloop:
+start_clr_loop:
         sta     $1e00,x
         sta     $1f00,x
         inx
-        bne     .clrloop
+        bne     start_clr_loop
         rts
+
+	INCLUDE "common_subroutines.asm"
 	
 logo:				; total: 45 characters = 360 bytes
 	; 1c00
@@ -141,3 +237,11 @@ logo:				; total: 45 characters = 360 bytes
 	dc.b 32,32,32,32,32,96,64,64		; 1d58
 	dc.b 0,0,0,0,0,0,0,220			; 1d60
 	dc.b 148,156,144,156,0,0,0,0		; 1d68
+
+message:		; "PRESS SPACE TO START"  -> 20 characters
+	;   	P         R         E        S         S        
+	dc.b	16+#$180, 18+#$180, 5+#$180, 19+#$180, 19+#$180, #46
+	;	S         P         A        C        E
+	dc.b	19+#$180, 16+#$180, 1+#$180, 3+#$180, 5+#$180, #46
+	;   	T         O                S         T         A        R         T
+	dc.b	20+#$180, 15+#$180,   #46, 19+#$180, 20+#$180, 1+#$180, 18+#$180, 20+#$180
