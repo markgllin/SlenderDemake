@@ -35,8 +35,6 @@ done_animate:
 
 place_letter: ; ************** CHANGE THIS ****************        
 	jsr     random
-	lsr	
-	bcs	place_letter		; only spawn letters on even locations
 	lda	LFSR			; This avoids clipping through trees
 
         sta     LETTER_LSB

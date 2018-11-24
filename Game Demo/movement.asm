@@ -66,10 +66,9 @@ invalid_movement:
         ;; restore previous position
         lda     PREV_SPRITE_LSB
         sta     SPRITE_LSB
+	sta     SPRITE_CLR_LSB
         lda     PREV_SPRITE_MSB
         sta     SPRITE_MSB
-        lda     PREV_SPRITE_CLR_LSB
-        sta     SPRITE_CLR_LSB
         lda     PREV_SPRITE_CLR_MSB
         sta     SPRITE_CLR_MSB
 
@@ -82,10 +81,9 @@ invalid_movement:
 save_previous:
         lda     SPRITE_LSB
         sta     PREV_SPRITE_LSB
+	sta     PREV_SPRITE_CLR_LSB
         lda     SPRITE_MSB
         sta     PREV_SPRITE_MSB
-        lda     SPRITE_CLR_LSB
-        sta     PREV_SPRITE_CLR_LSB
         lda     SPRITE_CLR_MSB
         sta     PREV_SPRITE_CLR_MSB
 
@@ -103,11 +101,7 @@ addSpriteOffset:
         clc                     ;2      ; clear the carry
         adc     SPRITE_LSB      ;3      ; add to LSB
         sta     SPRITE_LSB      ;3      ; store result in LSB
-
-        tya                     ;2
-        clc                     ;2
-        adc     SPRITE_CLR_LSB  ;3
-        sta     SPRITE_CLR_LSB  ;3
+	sta	SPRITE_CLR_LSB		; ALWAYS the same 
 
         bcc     addOffset_no_carry;~2
 
@@ -124,11 +118,6 @@ subSpriteOffset:
         sec                     ;2     ; clear the borrow
         sbc     SPRITE_LSB      ;3     ; sub from LSB
         sta     SPRITE_LSB      ;3     ; store result in LSB
-
-        lda     SPRITE_CLR_LSB  ;3
-        sty     SPRITE_CLR_LSB  ;3
-        sec                     ;2
-        sbc     SPRITE_CLR_LSB  ;3
         sta     SPRITE_CLR_LSB  ;3
 
         bcs     subOffset_no_borrow;~2

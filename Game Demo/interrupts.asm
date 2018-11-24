@@ -1,4 +1,5 @@
 timer_IRQ:
+	sei                     ; disable interrupts
         lda     VIA_CONTROL
         and     #$df            ; 1101 1111 - set timer 2 to one-shot-mode
         and     #$7f            ; 0111 1111 - clear first bit - disable PB7 (timer 1)
@@ -7,7 +8,6 @@ timer_IRQ:
         lda     #$e0            ; enable timer 1 and timer 2
         sta     VIA_ENABLE
 
-        sei                     ; disable interrupts
         lda     #<isr_manager   ; get low byte of ISR address
         ; reference for this notation: page 204
         sta     IRQ_L

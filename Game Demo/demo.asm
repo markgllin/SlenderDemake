@@ -119,7 +119,7 @@ init_all_the_things:
 	;; init the position of the sprite at spawn
         lda     #$01
         sta     SPRITE_Y
-        lda     #$0a
+        lda     #$03
         sta     SPRITE_X
 
         ;; init all the other things
@@ -153,7 +153,7 @@ init_timer_and_score_loop:
         sta     (SCRN_LSB),y
 
 place_character_sprite:
-        lda     #$35            ; offset sprite
+        lda     #$2e            ; offset sprite
         sta     SPRITE_LSB
         sta     SPRITE_CLR_LSB
 
@@ -162,6 +162,9 @@ place_character_sprite:
         lda     #CHAR_FORWARD
         sta     CURR_SPRITE
         draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
+
+	jsr	place_letter	; place letter in first room
+	jsr     draw_env	; draw environment around sprite
 
 start_timers:
         jsr	start_timer1
