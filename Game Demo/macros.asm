@@ -155,14 +155,4 @@
 	endm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; needs voice notes in [{1}]
-; needs voice duration in [{2}]
-	mac	next_duration
-	    lda     MOD_FLAG
-            beq     add_mod
-            inx
-            lda     [{1}],X
-            sta     [{2}]
-	endm
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
+

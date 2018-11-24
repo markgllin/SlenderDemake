@@ -153,7 +153,13 @@ change_S1:
         beq     done_song        
 
 	;; get duration for new note
-	next_duration	S1NOTES,S1_DUR		; MACRO
+	lda	MOD_FLAG
+	bne	no_add_mod_S1
+	inx
+no_add_mod_S1:
+	inx
+	lda	S1NOTES,X
+	sta	S1_DUR	
 check_S3:
         dec     S3_DUR
         bne     done_notes      ; all voices checked; done
@@ -162,7 +168,14 @@ change_S3:                      ; else, change S3 note
         next_note	S3_INDEX,S3NOTES	; MACRO
 
         ;; get duration for new note
-	next_duration	S3NOTES,S3_DUR		; MACRO
+	lda	MOD_FLAG
+	bne	no_add_mod_S3
+	inx
+no_add_mod_S3:
+	inx
+	lda	S3NOTES,X
+	sta	S3_DUR	
+
 done_notes:                     ; we have checked all the notes
         jmp     modulate        ; modulate the notes
 
@@ -186,7 +199,3 @@ start_timer2:
         lda     SECOND_H
         sta     TIMER2_H        ; STARTS the timer 2 and clears the interrupt request
 	rts
-
-add_mod:
-        inx
-        rts
