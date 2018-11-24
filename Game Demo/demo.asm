@@ -24,10 +24,7 @@ start:
         lda     #$7f            ; yellow = first four bits = 7 (ref p. 264)
         ; volume = other four bits = f
         ; 7f = 0111 1111 where 111 = 7 and 1111 = f
-
         sta     AUX_C
-        lda     #01             ; white characters
-        sta     CHR_C
 
         ;; load zeros into the "0" character of our custom charset
         ldx     #$00
@@ -73,7 +70,7 @@ copy_sprites:
         bne     copy_sprites
 
         ;; copy remaining 48 bytes (tree and letter)
-        ldx     #00
+        ; ldx     #00     ---> x is already 0 from above
 copy_others:
         lda     tree1,X
         sta     TREE_ADDRESS,X
@@ -138,31 +135,23 @@ init_all_the_things:
         jsr	restart_song
 	jsr	play_notes
 
-        ;; initialize the timer to 0300
-        ldy     #$0
-init_timer_loop:
+        ;; initialize the timer to 0300 and the score to 0000
+        ldx     #$0
+init_timer_and_score_loop:
 	; font colour should still be white from start screen
-        lda     #NUM_ZERO       ; number 0
-        sta     (SCRN_LSB),y    ; position
-        iny
-        cpy     #$04
-        bne     init_timer_loop
+        lda     #NUM_ZERO        ; number 0
+        sta     SCRN_MEM1,X      ; position of timer
+	sta	SCRN_MEM1+#$12,X ; position of score
+        inx
+        cpx     #$04
+        bne     init_timer_and_score_loop
 
+	;; make timer 0300 instead of 0000 from init above
         ldy     #$01
         lda     #NUM_ZERO + 3   ; number 3
         sta     (SCRN_LSB),y
         lda     #NUM_SEC
         sta     TIMER_CTR
-
-        ;; initialize the score
-        ldy     #$12
-init_score_loop: ;
-	; font colour should still be white from start screen
-        lda     #NUM_ZERO
-        sta     (SCRN_LSB),y
-        iny
-        cpy     #$16
-        bne     init_score_loop
 
         lda     #TREE_CHAR_COLOR
         sta     CURR_CLR

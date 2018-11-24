@@ -33,7 +33,7 @@ done_animate:
 
 ;;; ----- DRAWING ROUTINES
 
-place_letter:
+place_letter: ; ************** CHANGE THIS ****************
         lda     LFSR
         jsr     random
 

@@ -7,8 +7,8 @@ start_screen:
 	ldx	#00		
 	lda	#01
 fill_colour_mem:		; fill colour memory with white
-	sta	COLOR_MEM,x
-	sta	COLOR_MEM+#$ff,x
+	sta	COLOR_MEM,X
+	sta	COLOR_MEM+#$ff,X
 	inx
 	bne	fill_colour_mem
 
@@ -33,7 +33,6 @@ copy_letters:
 	;; store screen address MSB for plotting	
 	lda	#$1e
 	sta	$01
-
 	lda	#0
 	sta	$03			; counter for character num
 		
@@ -69,15 +68,12 @@ print_message:
 	cpx	#20
 	bne	print_message 
 
-
-	ldx	#00
-	ldy	#00
 start_input:
 	jsr	random
 	lda	LFSR
 	cmp	#248
 	bne	no_glitch
-	
+
 	jsr	glitch	
 
 no_glitch:
@@ -174,4 +170,3 @@ logo:				; total: 45 characters = 360 bytes
 	dc.b 32,32,32,32,32,96,64,64		; 1d58
 	dc.b 0,0,0,0,0,0,0,220			; 1d60
 	dc.b 148,156,144,156,0,0,0,0		; 1d68
-
