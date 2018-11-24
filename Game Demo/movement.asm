@@ -1,8 +1,11 @@
 ;;; ----- MOVEMENT ROUTINES
 check_movement:
+	;;;;;; ************* FIX THIS
+	;;;;;; **** ALLLLLLL of these checks should be true before letter
+	;;;;;; **** can be grabbed - right now can glitch through trees
         ;; collision checks
         ldy     #$00            ; top left corner
-        lda     (SPRITE_LSB),y
+        lda     (SPRITE_CLR_LSB),y
         cmp     #PATH
         bne     collision
         ldy     #$01            ; top right corner
@@ -56,9 +59,6 @@ done_score:
         sta     (LETTER_LSB),y
         iny
         sta     (LETTER_LSB),y
-
-        ;; new letter!
-        jsr     place_letter
 
         rts
 
