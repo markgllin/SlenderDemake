@@ -104,37 +104,21 @@ isr_first_digit:                ; check the seconds digit
 
 isr_first_wrap_around:
         inc     NUM_WRAPS
-
         lda     #NUM_NINE
         sta     (SCRN_LSB),y
-
-        ldy     #$02            ; check second digit
-        lda     (SCRN_LSB),y
-        cmp     #NUM_ZERO
-        beq     isr_second_wrap_around
-
-        sec
-        sbc     #$01
-        sta     (SCRN_LSB),y
-
-        jmp     check_timer1
+	
+	;; check 2nd digit
+	check_wrap	#$02,isr_second_wrap_around	; MACRO
+        jmp     check_timer1	; no wrap so get next IRQ
 
 isr_second_wrap_around:
         inc     NUM_WRAPS
-
         lda     #NUM_NINE
         sta     (SCRN_LSB),y
 
-        ldy     #$01            ; check third digit
-        lda     (SCRN_LSB),y
-        cmp     #NUM_ZERO
-        beq     isr_third_wrap_around
-
-        sec
-        sbc     #$01
-        sta     (SCRN_LSB),y
-
-        jmp     check_timer1
+	;; check 3rd digit
+	check_wrap	#$01,isr_third_wrap_around 	; MACRO
+        jmp     check_timer1	; no wrap so get next IRQ
 
 isr_third_wrap_around:
         inc     NUM_WRAPS
@@ -147,7 +131,7 @@ isr_third_wrap_around:
         lda     #NUM_NINE
         sta     (SCRN_LSB),y
 
-        jmp     check_timer1
+        jmp     check_timer1	
 
 isr_trigger_end_game:
         ;; reset timer to ZERO since wrap around for first
@@ -171,39 +155,21 @@ isr_update_music:
         bne     check_S3        ; if not zero, don't change the note and check next voice
 change_S1:
         ;; move the S1 pointer to the next note
-        ldx     S1_INDEX
-        inx
-        inx
-        inx
-        lda     S1NOTES,X
+        next_note	S1_INDEX,S1NOTES	; MACRO
         cmp     #$ff
-        beq     done_song
-        stx     S1_INDEX
+        beq     done_song        
 
-        ;; get duration for new note
-        lda     MOD_FLAG
-        beq     add_mod
-        inx
-        lda     S1NOTES,X
-        sta     S1_DUR
+	;; get duration for new note
+	next_duration	S1NOTES,S1_DUR		; MACRO
 check_S3:
         dec     S3_DUR
         bne     done_notes      ; all voices checked; done
 change_S3:                      ; else, change S3 note
         ;; move the S3 pointer to the next note
-        ldx     S3_INDEX
-        inx
-        inx
-        inx
-        lda     S3NOTES,X
-        stx     S3_INDEX
+        next_note	S3_INDEX,S3NOTES	; MACRO
 
         ;; get duration for new note
-        lda     MOD_FLAG
-        beq     add_mod
-        inx
-        lda     S3NOTES,X
-        sta     S3_DUR
+	next_duration	S3NOTES,S3_DUR		; MACRO
 done_notes:                     ; we have checked all the notes
         ;;  restart the timer
         lda     #SIXT_L

@@ -124,3 +124,45 @@
             cmp     #PATH
         endm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; needs digit number in [{1}]
+; needs branch in [{2}]
+	mac	check_wrap
+            ldy     #[{1}]           ; check digit #[{1}]
+            lda     (SCRN_LSB),y
+            cmp     #NUM_ZERO
+            beq     [{2}]
+
+            sec
+            sbc     #$01
+            sta     (SCRN_LSB),y
+	endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; needs voice index in [{1}]
+; needs voice notes in [{2}]
+	mac	next_note
+	    ldx     [{1}]
+            inx			; incrementing 3 times actually takes less bytes
+            inx			; than adding 3 using the accumulator and transfering
+            inx
+            lda     [{2}],X 
+	    stx     [{1}]
+	endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; needs voice notes in [{1}]
+; needs voice duration in [{2}]
+	mac	next_duration
+	    lda     MOD_FLAG
+            beq     add_mod
+            inx
+            lda     [{1}],X
+            sta     [{2}]
+	endm
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
