@@ -1,11 +1,8 @@
 ;;; ----- MOVEMENT ROUTINES
 check_movement:
-	;;;;;; ************* FIX THIS
-	;;;;;; **** ALLLLLLL of these checks should be true before letter
-	;;;;;; **** can be grabbed - right now can glitch through trees
         ;; collision checks
         ldy     #$00            ; top left corner
-        lda     (SPRITE_CLR_LSB),y
+        lda     (SPRITE_LSB),y
         cmp     #PATH
         bne     collision
         ldy     #$01            ; top right corner
@@ -37,6 +34,9 @@ letter_found:
         bne     score_no_wrap
 
         ;; score wraps, so do that
+	;; we only check for a SINGLE WRAP --- i.e. the maximum score is 9900
+	;; anything more than that and our code will break, but this was on purpose
+	;; what are the chances that someone can find 99 letters in the allocated time?
         lda     #NUM_ZERO
         sta     (SCORE_LSB),y
 
@@ -138,4 +138,3 @@ subSpriteOffset:
 
 subOffset_no_borrow:
         rts
-

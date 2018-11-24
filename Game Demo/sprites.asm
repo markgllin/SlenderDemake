@@ -33,9 +33,11 @@ done_animate:
 
 ;;; ----- DRAWING ROUTINES
 
-place_letter: ; ************** CHANGE THIS ****************
-        lda     LFSR
-        jsr     random
+place_letter: ; ************** CHANGE THIS ****************        
+	jsr     random
+	lsr	
+	bcs	place_letter		; only spawn letters on even locations
+	lda	LFSR			; This avoids clipping through trees
 
         sta     LETTER_LSB
         sta     LETTER_CLR_LSB
