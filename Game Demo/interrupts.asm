@@ -69,11 +69,7 @@ isr_update_timer:
         beq     check_timer1
 
         ;; correct timer interrupt so do the thing
-        ;; start by restarting the timer
-        lda     SECOND_L
-        sta     TIMER2_L
-        lda     SECOND_H
-        sta     TIMER2_H        ; STARTS the timer and clears the interrupt request
+	jsr	start_timer2	; start by restarting the timer
 
         dec     TIMER_CTR
         lda     TIMER_CTR
@@ -146,10 +142,7 @@ isr_trigger_end_game:
 ;;;  	 If the timer hasn't run out yet, modulate the note instead
 isr_update_music:
 	;;  restart the timer
-        lda     #SIXT_L
-        sta     TIMER1_L
-        lda     #SIXT_H
-        sta     TIMER1_H        ; STARTS the timer and clears the interrupt request
+        jsr	start_timer1
 
         dec     S1_DUR          ; single sixteenth note has passed
         bne     check_S3        ; if not zero, don't change the note and check next voice
@@ -179,6 +172,20 @@ done_song:
         jmp     done_mod
 
 ; --- SUBROUTINES
+
+start_timer1:
+	lda     #SIXT_L
+        sta     TIMER1_L
+        lda     #SIXT_H
+        sta     TIMER1_H        ; STARTS the timer 1
+	rts
+
+start_timer2:
+	lda     SECOND_L
+        sta     TIMER2_L
+        lda     SECOND_H
+        sta     TIMER2_H        ; STARTS the timer 2 and clears the interrupt request
+	rts
 
 add_mod:
         inx

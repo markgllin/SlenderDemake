@@ -35,23 +35,21 @@ copy_letters:
 	sta	$01
 	lda	#0
 	sta	$03			; counter for character num
+	sta	$05			; counter for seeding maze generation
 		
 	ldy	#0			; counter for columns
-	lda	#0
 print_logo_row:
 	ldx	#0			; counter for rows
-	lda	#$5e		
-	sta	$00			; LSB of screen memory - controls offset
+	lda	#$5e			; offset of logo
+	sta	$00			; LSB of screen memory - prints at offset
 print_logo_column:
 	lda	$03			; print the current character
 	sta	($00),y
 	inc	$03			; get the next character
-
 	lda	$00			; jump down one row
 	clc
 	adc	#$16
 	sta	$00
-
 	inx				; check if 5 rows have been printed
 	cpx	#5
 	bne	print_logo_column
@@ -63,12 +61,15 @@ print_logo_column:
 	ldx	#0
 print_message:
 	lda	message,X		; grab index for characters
-	sta	$1f35,X
+	sta	$1f35,X			; print message starting at $1f35 on screen
 	inx
 	cpx	#20
 	bne	print_message 
 
+	lda     #SEED           	; init the SEEEED for RNG glitching
+        sta     LFSR
 start_input:
+	inc	$05
 	jsr	random
 	lda	LFSR
 	cmp	#248
@@ -81,6 +82,8 @@ no_glitch:
         cmp     #SPACE_KEY
 	bne	start_input
 
+	lda	$05
+	sta	LFSR
 	rts
 
 glitch:
@@ -170,3 +173,4 @@ logo:				; total: 45 characters = 360 bytes
 	dc.b 32,32,32,32,32,96,64,64		; 1d58
 	dc.b 0,0,0,0,0,0,0,220			; 1d60
 	dc.b 148,156,144,156,0,0,0,0		; 1d68
+

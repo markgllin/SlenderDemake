@@ -109,7 +109,7 @@ applyMask       subroutine
         cmp     #9
         beq     .checkSpriteX   ; (3,9) and (20,9) are the boundaries for drawing trees
 .drawAllSegments                ; otherwise, trees will wrap around screen
-        ldx     TREE_SPRITE
+        ldx     TREE1
         ldy     #$00
         jsr     treeSegments
         ldy     #$16
@@ -142,21 +142,20 @@ treeSegments    subroutine
         rts
 .drawTL
         ldx     #(CLEAR_CHAR_TL+OFFSET_TO_TREES)
-        draw_sprite TREE_CLR, TREE_CLR_LSB, TREE_LSB
+        draw_sprite #TREE_CHAR_COLOR, TREE_CLR_LSB, TREE_LSB
         rts
 .drawTR
         ldx     #(CLEAR_CHAR_TR+OFFSET_TO_TREES)
-        draw_sprite TREE_CLR, TREE_CLR_LSB, TREE_LSB
+        draw_sprite #TREE_CHAR_COLOR, TREE_CLR_LSB, TREE_LSB
         rts
 .drawBL
         ldx     #(CLEAR_CHAR_BL+OFFSET_TO_TREES)
-        draw_sprite TREE_CLR, TREE_CLR_LSB, TREE_LSB
+        draw_sprite #TREE_CHAR_COLOR, TREE_CLR_LSB, TREE_LSB
         rts
 .drawBR
         ldx     #(CLEAR_CHAR_BR+OFFSET_TO_TREES)
-        draw_sprite TREE_CLR, TREE_CLR_LSB, TREE_LSB
+        draw_sprite #TREE_CHAR_COLOR, TREE_CLR_LSB, TREE_LSB
         rts
-
 
 ;;; ---- SPRITES AND STUFF
 sprite:
@@ -216,3 +215,4 @@ tree1:
 letter:
         BYTE    0,15,11,13,14,15,15,0
         BYTE    0,240,208,176,112,240,240,0
+

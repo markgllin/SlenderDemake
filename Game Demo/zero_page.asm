@@ -52,18 +52,16 @@ MAZE_LSB        = $2a
 MAZE_MSB        = $2b
 MAZE_DIR        = $2c
 
-TREE_CLR        = $2e
-TREE_SPRITE     = $2f
-TREE_CLR_LSB    = $30
-TREE_CLR_MSB    = $31
-TREE_LSB        = $32
-TREE_MSB        = $33
+TREE_CLR_LSB    = $2d
+TREE_CLR_MSB    = $2e
+TREE_LSB        = $2f
+TREE_MSB        = $30
 
-S1_INDEX        = $35
-S1_DUR          = $36
-S3_INDEX        = $37
-S3_DUR          = $39
-MOD_FLAG        = $3a
+S1_INDEX        = $31
+S1_DUR          = $32
+S3_INDEX        = $33
+S3_DUR          = $34
+MOD_FLAG        = $35
 
-ANIMATE_COUNT   = $3b
-ANIMATE_STATUS  = $3d
+ANIMATE_COUNT   = $36
+ANIMATE_STATUS  = $37

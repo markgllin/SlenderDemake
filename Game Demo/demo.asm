@@ -90,12 +90,14 @@ copy_numbers:
         bne     copy_numbers
 
 init_all_the_things:
-        ;; store memory addresses for calculations later
-        lda     #$00            ; load LSB
+        ;; load 0 everywhere that needs it
+        lda     #$00            
         sta     SCRN_LSB
         sta     SPRITE_LSB
         sta     CLRM_LSB
         sta     SPRITE_CLR_LSB
+	sta     NUM_WRAPS
+	sta     ANIMATE_STATUS
 
         lda     #$12		; 4 characters away from right top corner
         sta     SCORE_LSB	; position of the score on screen 
@@ -104,6 +106,7 @@ init_all_the_things:
         sta     SCRN_MSB
         sta     SPRITE_MSB
         sta     SCORE_MSB
+
         lda     #$1f		; ************** CHANGE THIS ****************
         sta     LETTER_MSB
 
@@ -120,16 +123,14 @@ init_all_the_things:
         sta     SPRITE_X
 
         ;; init all the other things
-        lda     #$00
-        sta     NUM_WRAPS
         lda     #$ff
-        sta     GAME_STATUS
-        lda     #SEED           ; init the SEEEED for RNG
-        sta     LFSR
+        sta     GAME_STATUS	; if 0, then end game
+
         lda     #ANIMATION_DELAY
-        sta     ANIMATE_COUNT
-        lda     #$00
-        sta     ANIMATE_STATUS
+        sta     ANIMATE_COUNT 	; controls animation of sprite
+
+        lda     #NUM_SEC
+        sta     TIMER_CTR	; when 0, a second has passed
 
         ;; init all the music things
         jsr	restart_song
@@ -150,15 +151,6 @@ init_timer_and_score_loop:
         ldy     #$01
         lda     #NUM_ZERO + 3   ; number 3
         sta     (SCRN_LSB),y
-        lda     #NUM_SEC
-        sta     TIMER_CTR
-
-        lda     #TREE_CHAR_COLOR
-        sta     CURR_CLR
-        sta     TREE_CLR
-        lda     #TREE1
-        sta     CURR_SPRITE
-        sta     TREE_SPRITE
 
 place_character_sprite:
         lda     #$35            ; offset sprite
@@ -171,16 +163,9 @@ place_character_sprite:
         sta     CURR_SPRITE
         draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
 
-start_timer:
-        lda     SECOND_L
-        sta     TIMER2_L
-        lda     SECOND_H
-        sta     TIMER2_H        ; STARTS the timer 2
-
-        lda     #SIXT_L
-        sta     TIMER1_L
-        lda     #SIXT_H
-        sta     TIMER1_H        ; STARTS the timer 1
+start_timers:
+        jsr	start_timer1
+	jsr	start_timer2
 
 ;;; ----- INPUT
 input:
