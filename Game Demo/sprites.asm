@@ -1,3 +1,36 @@
+;; sprite animation
+
+animate_sprite:
+        dec     ANIMATE_COUNT
+        bne     done_animate
+
+        lda     ANIMATE_STATUS
+        bne     animate_blink
+animate_open:
+        lda     #$ff
+        sta     ANIMATE_STATUS
+
+        lda     CURR_SPRITE
+        clc
+        adc     #$10
+        sta     CURR_SPRITE
+
+        jmp     draw_animate
+animate_blink:
+        lda     #$00
+        sta     ANIMATE_STATUS
+
+        lda     CURR_SPRITE
+        sec
+        sbc     #$10
+        sta     CURR_SPRITE
+draw_animate:
+        draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
+        lda     #ANIMATION_DELAY
+        sta     ANIMATE_COUNT
+done_animate:
+        rts
+
 ;;; ----- DRAWING ROUTINES
 
 place_letter:

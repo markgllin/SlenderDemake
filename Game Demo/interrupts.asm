@@ -49,12 +49,7 @@ zero_mod:                       ; currently pointing at first  "mod" note
         inc     S1_INDEX        ; point at second "mod" note
         inc     S3_INDEX
 done_mod:
-        ldx     S1_INDEX
-        lda     S1NOTES,X
-        sta     S1              ; load the new note and play it
-        ldx     S3_INDEX
-        lda     S3NOTES,X
-        sta     S3
+        jsr	play_notes
 
 done_interrupt:
         pla
@@ -65,7 +60,7 @@ done_interrupt:
 
         jmp     OLD_IRQ         ; continue on to old IRQ
 
-        rti
+;;;;;; END OF INTERRUPT HANDLER
 
 ;; update timer happens FIRST
 isr_update_timer:
@@ -90,40 +85,39 @@ isr_update_timer:
 
         jsr     animate_sprite
 
-isr_first_digit:                ; check the seconds digit
+isr_first_digit:                ; check the first figit (1 second)
         ldy     #$03
         lda     (SCRN_LSB),y
         cmp     #NUM_ZERO
         beq     isr_first_wrap_around
-
         sec
         sbc     #$01
         sta     (SCRN_LSB),y
 
         jmp     check_timer1
 
-isr_first_wrap_around:
+isr_first_wrap_around:		; first digit (1 second) wrapped around
         inc     NUM_WRAPS
         lda     #NUM_NINE
         sta     (SCRN_LSB),y
 	
-	;; check 2nd digit
+	;; check the second digit (10 seconds)
 	check_wrap	#$02,isr_second_wrap_around	; MACRO
         jmp     check_timer1	; no wrap so get next IRQ
 
-isr_second_wrap_around:
+isr_second_wrap_around:		; second digit (10 seconds) wrapped around	
         inc     NUM_WRAPS
         lda     #NUM_NINE
         sta     (SCRN_LSB),y
 
-	;; check 3rd digit
+	;; check the third digit (100 seconds)
 	check_wrap	#$01,isr_third_wrap_around 	; MACRO
         jmp     check_timer1	; no wrap so get next IRQ
 
-isr_third_wrap_around:
+isr_third_wrap_around:	;	; third digit (100 seconds) wrapped around
         inc     NUM_WRAPS
         lda     NUM_WRAPS
-        cmp     #$03
+        cmp     #$03		; check if timer reached 0000
         beq     isr_trigger_end_game
 
         lda     #$00            ; NOT end game so reset wraps
@@ -151,6 +145,12 @@ isr_trigger_end_game:
 ;;;      This ISR grabs the next note for each voice when timer 2 runs out
 ;;;  	 If the timer hasn't run out yet, modulate the note instead
 isr_update_music:
+	;;  restart the timer
+        lda     #SIXT_L
+        sta     TIMER1_L
+        lda     #SIXT_H
+        sta     TIMER1_H        ; STARTS the timer and clears the interrupt request
+
         dec     S1_DUR          ; single sixteenth note has passed
         bne     check_S3        ; if not zero, don't change the note and check next voice
 change_S1:
@@ -171,73 +171,15 @@ change_S3:                      ; else, change S3 note
         ;; get duration for new note
 	next_duration	S3NOTES,S3_DUR		; MACRO
 done_notes:                     ; we have checked all the notes
-        ;;  restart the timer
-        lda     #SIXT_L
-        sta     TIMER1_L
-        lda     #SIXT_H
-        sta     TIMER1_H        ; STARTS the timer and clears the interrupt request
-
         jmp     modulate        ; modulate the notes
 
 done_song:
         ;; restart the song from the beginning
-        lda     #0
-        sta     S1_INDEX
-        sta     S3_INDEX
-        sta     MOD_FLAG
-
-        lda     S1NOTES + 2
-        sta     S1_DUR
-        lda     S3NOTES + 2
-        sta     S3_DUR
-
-        ;;  restart the timer
-        lda     #SIXT_L
-        sta     TIMER1_L
-        lda     #SIXT_H
-        sta     TIMER1_H        ; STARTS the timer and clears the interrupt request
-
+    	jsr	restart_song
         jmp     done_mod
 
 ; --- SUBROUTINES
 
 add_mod:
         inx
-        rts
-
-;; sprite animation
-
-animate_sprite:
-        dec     ANIMATE_COUNT
-        bne     done_animate
-
-        lda     ANIMATE_STATUS
-        bne     animate_blink
-
-animate_open:
-        lda     #$ff
-        sta     ANIMATE_STATUS
-
-        lda     CURR_SPRITE
-        clc
-        adc     #$10
-        sta     CURR_SPRITE
-
-        jmp     draw_animate
-
-animate_blink:
-        lda     #$00
-        sta     ANIMATE_STATUS
-
-        lda     CURR_SPRITE
-        sec
-        sbc     #$10
-        sta     CURR_SPRITE
-
-draw_animate:
-        draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
-
-        lda     #ANIMATION_DELAY
-        sta     ANIMATE_COUNT
-done_animate:
         rts

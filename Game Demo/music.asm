@@ -1,3 +1,23 @@
+restart_song:
+	lda     #0
+        sta     S1_INDEX
+        sta     S3_INDEX
+        sta     MOD_FLAG
+
+        lda     S1NOTES + 2
+        sta     S1_DUR
+        lda     S3NOTES + 2
+        sta     S3_DUR
+	rts
+
+play_notes:
+	ldx     S1_INDEX
+        lda     S1NOTES,X
+        sta     S1              ; load the new note and play it
+        ldx     S3_INDEX
+        lda     S3NOTES,X
+        sta     S3
+	rts
 
 ;;; --- MUSIC ---
 ;;; first two bytes are notes, third byte is type / length

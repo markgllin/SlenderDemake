@@ -135,20 +135,8 @@ init_all_the_things:
         sta     ANIMATE_STATUS
 
         ;; init all the music things
-        lda     #0
-        sta     S1_INDEX
-        sta     S3_INDEX
-        sta     MOD_FLAG
-
-        lda     S1NOTES + 2
-        sta     S1_DUR
-        lda     S3NOTES + 2
-        sta     S3_DUR
-
-        lda     S1NOTES
-        sta     S1
-        lda     S3NOTES
-        sta     S3
+        jsr	restart_song
+	jsr	play_notes
 
         ;; initialize the timer to 0300
         ldy     #$0
