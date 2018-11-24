@@ -11,8 +11,8 @@ TODO:
 - multiple rooms - in progress
 
 - ~~collision detection~~
-- title screen - in progress
-- end game screen
+- ~~title screen~~
+- end game screen - in progress along with optimization
 - ~~score~~
 
   Also (technically) working but the code does NOT account for the max score of 9900. BUT is this even necessary? That would mean collecting 99 letters... I really doubt (in the real game) that would happen. So I don't see a point adding this check if we just make sure it never happens! Is there a difference between just lazy coding and efficient coding? :P
