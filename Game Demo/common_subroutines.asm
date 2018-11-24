@@ -74,13 +74,13 @@ startFrame      subroutine
         rts
 
 ; displays player coordinates in bottom left corner
-debugCoordinates
-        lda     SPRITE_X
-        CLC
-        adc     #NUM_ZERO
-        sta     8164
-        lda     SPRITE_Y
-        CLC
-        adc     #NUM_ZERO
-        sta     8165
-        rts
+; debugCoordinates
+;        lda     SPRITE_X
+;        CLC
+;        adc     #NUM_ZERO
+;        sta     8164
+;        lda     SPRITE_Y
+;        CLC
+;        adc     #NUM_ZERO
+;        sta     8165
+;        rts
