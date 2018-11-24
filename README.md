@@ -21,7 +21,13 @@ TODO:
 - ~~flashlight effect~~
 - ~~sprite animations~~
 
+FIXES:
+- fix timer + score after changing rooms (i.e. fix clear screen subroutine)
+- fix letter generation/placement + remember if letter has been found in a room 
+- OPTIMIZE, OPTIMIZE, OPTIMIZE
+
 Maybes
+- remember if a room has been visited
 - text box (e.g. 'You here some rustling')
 - add slenderman
 - cheat codes
