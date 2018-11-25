@@ -14,6 +14,9 @@ end:
 
 	lda     #255            ; custom character set
         sta     $9005
+	lda	28
+	sta	56
+	sta	58
 
         ;; set up the interrupts
 	jsr	start_screen
