@@ -156,7 +156,12 @@ doneMaze        subroutine
 
 .placeObjects
         jsr     maskTrees
+
+        lda     CURR_ROOM
+        and     LETTER_STATE
+        bne     .ret
         jsr     place_letter
+.ret
         rts
 
 backtrack       subroutine

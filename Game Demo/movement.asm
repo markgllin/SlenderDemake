@@ -28,6 +28,10 @@ collision:
 letter_found:
         ;; found a letter!
         ;; so update the score
+        lda     LETTER_STATE
+        ora     CURR_ROOM
+        sta     LETTER_STATE
+        
         ldy     #$01            ; second digit from the left
         lda     (SCORE_LSB),y
         cmp     #NUM_NINE
