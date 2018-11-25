@@ -150,7 +150,7 @@ init_timer_and_score_loop:
         ; sta     SCORE_ADDRESS,y
 
         jsr     random
-        lda     ROOM_SEED
+        sta     ROOM_SEED
 
 place_character_sprite:
         jsr     generateMaze
