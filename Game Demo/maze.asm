@@ -16,9 +16,14 @@ generateMaze    subroutine
         sta     $1e2e
 
 .setSeed
+        LDA     CURR_ROOM
+        asl
+        ORA     CURR_ROOM
+        asl
+        ORA     CURR_ROOM
+        TAX
         lda     ROOM_SEED
         sta     LFSR
-        ldx     #0
 .cycleSeeds
         jsr     random
         inx
@@ -421,7 +426,7 @@ checkDoorways   subroutine
 .checkExit
         cmp     #0
         bne     .keepMaze
-.newMazeLeft
+.newMazeLeft            ; player at exit, generate room on left
         lda     #MAZE_ENTRANCE_X_COORD
         sta     SPRITE_X
 
@@ -435,7 +440,7 @@ checkDoorways   subroutine
         asl     CURR_ROOM
 
         jmp     .makeMaze
-.newMazeRight
+.newMazeRight           ; player at entrance, generate room on right
         lda     #MAZE_EXIT_X_COORD
         sta     SPRITE_X
 
