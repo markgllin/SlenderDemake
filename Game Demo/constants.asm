@@ -124,8 +124,11 @@ SPACE_KEY	= 32
 
 SEED            = 50            ; can be anything but 0
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;          START SCREEN                ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;            SPLASH SCREENS              ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ALPHABET_ROM    = $8001
+GLITCH_COUNT    = #10		; number of loops for glitch effect
+END_BYTE  	= #$ff
+

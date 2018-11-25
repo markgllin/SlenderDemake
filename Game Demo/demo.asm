@@ -141,7 +141,7 @@ init_timer_and_score_loop:
         bne     init_timer_and_score_loop
 
 	;; make timer 0300 instead of 0000 from init above
-        ldy     #$01
+        ldy     #$03		; third digit
         lda     #NUM_ZERO + 3   ; number 3
         sta     (SCRN_LSB),y
 
@@ -234,7 +234,7 @@ doneInput:
 ;;; ----- END GAME
 
 end_game:
-        jmp     end_game
+        jmp     end_screen
 
         INCLUDE "maze.asm"
         INCLUDE "common_subroutines.asm"
@@ -242,4 +242,5 @@ end_game:
         INCLUDE "interrupts.asm"
         INCLUDE "sprites.asm"
         INCLUDE "music.asm"
+	INCLUDE	"end_screen.asm"
 	INCLUDE "start_screen.asm"  ;;; this MUST be last unless you want bad things to happen

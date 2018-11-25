@@ -65,3 +65,22 @@ MOD_FLAG        = $35
 
 ANIMATE_COUNT   = $36
 ANIMATE_STATUS  = $37
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;            SPLASH SCREENS              ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+SP_SCREEN_LSB	= $00
+SP_SCREEN_MSB 	= $01
+CHAR_NUM_CTR    = $03
+GLITCH_CTR	= $04
+MAZE_SEED	= $05
+
+;; SKIP $07 FOR END GAME CONDITION
+
+MSG_ADDR_LSB    = $08
+MSG_ADDR_MSB	= $09
+SCRN_OFFSET_LSB = $0a
+SCRN_OFFSET_MSB = $0b
+MSG_NUM_CHARS   = $0c
+

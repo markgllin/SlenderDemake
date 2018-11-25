@@ -24,6 +24,11 @@ isr_manager:
         pha                     ; save old X
         tya
         pha                     ; save old Y
+
+	;; check end game condition in case it's already end game
+        lda     GAME_STATUS
+        beq	done_interrupt
+
 check_timer2:
         ;; check that the interrupt is happening from timer 2
         lda     VIA_FLAGS
@@ -64,10 +69,6 @@ done_interrupt:
 
 ;; update timer happens FIRST
 isr_update_timer:
-        ;; check end game condition in case it's already end game
-        lda     GAME_STATUS
-        beq     check_timer1
-
         ;; correct timer interrupt so do the thing
 	jsr	start_timer2	; start by restarting the timer
 

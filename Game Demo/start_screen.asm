@@ -1,6 +1,111 @@
 start_screen:
-	jsr	start_clr
+	jsr	prep_splash_screen
+	
+;;;; now that copying is done, print that thing
 
+	;; store screen address MSB for plotting	
+	lda	#$1e
+	sta	SP_SCREEN_MSB
+	lda	#0
+	sta	CHAR_NUM_CTR		; counter for character num
+	sta	MAZE_SEED		; counter for seeding maze generation
+		
+	ldy	#0			; counter for columns
+print_logo_row:
+	ldx	#0			; counter for rows
+	lda	#$5e			; offset of logo
+	sta	SP_SCREEN_LSB		; LSB of screen memory - prints at offset
+print_logo_column:
+	lda	CHAR_NUM_CTR		; print the current character
+	sta	($00),y
+	inc	CHAR_NUM_CTR		; get the next character
+	lda	$00			; jump down one row
+	clc
+	adc	#$16
+	sta	SP_SCREEN_LSB
+	inx				; check if 5 rows have been printed
+	cpx	#5
+	bne	print_logo_column
+
+	iny				; check if 9 columns have been printed
+	cpy	#9
+	bne	print_logo_row
+
+	lda     #<message	        ; get low byte of message address to print
+	sta	MSG_ADDR_LSB
+	lda     #>message	        ; get high byte of message address to print
+	sta	MSG_ADDR_MSB
+	lda	#$1f
+	sta	SCRN_OFFSET_MSB
+	lda	#$35
+	sta	SCRN_OFFSET_LSB
+	jsr	print_message
+
+	lda     #SEED           	; init the SEEEED for RNG glitching
+        sta     LFSR
+start_input:
+	inc	MAZE_SEED
+	jsr	random
+	lda	LFSR
+	cmp	#248
+	bne	no_glitch
+
+	jsr	glitch	
+
+no_glitch:
+        lda     SCAN_KEYBOARD
+        cmp     #SPACE_KEY
+	bne	start_input
+
+	lda	$05
+	sta	LFSR
+	rts
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;              SUBROUTINES               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; expects message address in MSG_ADDR_LSB/MSB
+; expects message offset in SCRN_OFFSET_LSB/MSB
+print_message:
+	ldy	#0
+print_message_loop:
+	lda	(MSG_ADDR_LSB),y		; grab index for characters
+	cmp	#END_BYTE
+	beq	done_printing
+
+	sta	(SCRN_OFFSET_LSB),y		; print message starting at $1f35 on screen
+	iny
+
+	jmp	print_message_loop
+
+done_printing:
+	rts
+
+;; create a glitch effect
+glitch:
+	lda	#GLITCH_COUNT
+	sta	GLITCH_CTR
+glitch_loop:
+	inc	SCRN_V
+	inc	SCRN_H
+	dec	GLITCH_CTR
+	bne	glitch_loop
+
+	lda	#GLITCH_COUNT
+	sta	GLITCH_CTR
+glitch_undo:
+	dec	SCRN_V
+	dec	SCRN_H
+	dec	GLITCH_CTR
+	bne	glitch_undo
+	
+	rts
+
+;; preps for a splash screen by setting the correct colours, clearing
+;; the entire screen, and copying the necessary characters
+prep_splash_screen:
 	lda     #8              ; border black, screen black (ref p. 265)
         sta     SCR_C
 
@@ -27,85 +132,6 @@ copy_letters:
 	inx
 	cpx	#27
 	bne	copy_letters
-	
-;;;; now that copying is done, print that thing
-
-	;; store screen address MSB for plotting	
-	lda	#$1e
-	sta	$01
-	lda	#0
-	sta	$03			; counter for character num
-	sta	$05			; counter for seeding maze generation
-		
-	ldy	#0			; counter for columns
-print_logo_row:
-	ldx	#0			; counter for rows
-	lda	#$5e			; offset of logo
-	sta	$00			; LSB of screen memory - prints at offset
-print_logo_column:
-	lda	$03			; print the current character
-	sta	($00),y
-	inc	$03			; get the next character
-	lda	$00			; jump down one row
-	clc
-	adc	#$16
-	sta	$00
-	inx				; check if 5 rows have been printed
-	cpx	#5
-	bne	print_logo_column
-
-	iny				; check if 9 columns have been printed
-	cpy	#9
-	bne	print_logo_row
-
-	ldx	#0
-print_message:
-	lda	message,X		; grab index for characters
-	sta	$1f35,X			; print message starting at $1f35 on screen
-	inx
-	cpx	#20
-	bne	print_message 
-
-	lda     #SEED           	; init the SEEEED for RNG glitching
-        sta     LFSR
-start_input:
-	inc	$05
-	jsr	random
-	lda	LFSR
-	cmp	#248
-	bne	no_glitch
-
-	jsr	glitch	
-
-no_glitch:
-        lda     SCAN_KEYBOARD
-        cmp     #SPACE_KEY
-	bne	start_input
-
-	lda	$05
-	sta	LFSR
-	rts
-
-glitch:
-	lda	#10
-	sta	$04
-glitch_loop:
-	inc	SCRN_V
-	inc	SCRN_H
-	dec	$04
-	bne	glitch_loop
-
-	lda	#10
-	sta	$04
-glitch_undo:
-	dec	SCRN_V
-	dec	SCRN_H
-	dec	$04
-	bne	glitch_undo
-	
-	rts
-
-; special clear screen that clears ENTIRE screen - just for start and end screens
 start_clr:
         lda     #46
         ldx     #0
@@ -116,15 +142,19 @@ start_clr_loop:
         bne     start_clr_loop
         rts
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 DATA                   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 message:		; "PRESS SPACE TO START"  -> 20 bytes
 	;   	P         R         E        S         S        
 	dc.b	16+#$180, 18+#$180, 5+#$180, 19+#$180, 19+#$180, #46
 	;	S         P         A        C        E
 	dc.b	19+#$180, 16+#$180, 1+#$180, 3+#$180, 5+#$180, #46
 	;   	T         O                S         T         A        R         T
-	dc.b	20+#$180, 15+#$180,   #46, 19+#$180, 20+#$180, 1+#$180, 18+#$180, 20+#$180
+	dc.b	20+#$180, 15+#$180,   #46, 19+#$180, 20+#$180, 1+#$180, 18+#$180, 20+#$180, END_BYTE
 
-	org 	$1c00		; naughty trick - just load right into custom character set
+	org 	CHAR_MEM	; naughty trick - just load right into custom character set
 logo:				; total: 45 characters = 360 bytes
 	; 1c00
 	dc.b 0,0,3,7,14,28,28,30		
