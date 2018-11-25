@@ -43,8 +43,8 @@ SPRITE_ADDRESS  = $1c30         ; where the sprites start (7216)
 TREE_ADDRESS    = $1d30         ; where the tree starts (7472)
 NUMBERS_ADDRESS = $1d60         ; where numbers start in custom charset
 
-TIMER_ADDRESS 	= $1e00
-SCORE_ADDRESS   = $1e12
+TIMER_ADDRESS 	= $1fe4
+SCORE_ADDRESS   = $1ff6
 
 ;;; ---- CONSTANTS
 

@@ -99,13 +99,18 @@ init_all_the_things:
 	sta	GAME_STATUS	; if non-zero, then end the game
         sta     LETTER_STATE
 
-        lda     #$12		; 4 characters away from right top corner
+        lda     #$f6		; 4 characters away from right top corner
         sta     SCORE_LSB	; position of the score on screen 
+	lda	#$e4
+	sta	SCRN_LSB
 
         lda     #$1e            ; load MSB
-        sta     SCRN_MSB
         sta     SPRITE_MSB
         sta     SCORE_MSB
+
+	lda	#$1f
+	sta	SCORE_MSB
+	sta	SCRN_MSB
 
         lda     #$96
         sta     CLRM_MSB
