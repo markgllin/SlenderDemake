@@ -106,6 +106,22 @@ glitch_undo:
 ;; preps for a splash screen by setting the correct colours, clearing
 ;; the entire screen, and copying the necessary characters
 prep_splash_screen:
+	ldx	#00
+	lda	#00
+copy_blank_loop:		; make sure blank character is where it should be
+	sta	CHAR_MEM+#$170,X
+	inx	
+	cpx	#8
+	bne	copy_blank_loop
+
+        lda     #46
+        ldx     #0
+start_clr_loop:
+        sta     $1e00,x
+        sta     $1f00,x
+        inx
+        bne     start_clr_loop
+
 	lda     #8              ; border black, screen black (ref p. 265)
         sta     SCR_C
 
@@ -116,14 +132,6 @@ fill_colour_mem:		; fill colour memory with white
 	sta	COLOR_MEM+#$ff,X
 	inx
 	bne	fill_colour_mem
-
-	ldx	#00
-	lda	#00
-copy_blank_loop:		; make sure blank character is where it should be
-	sta	CHAR_MEM+#$170,X
-	inx	
-	cpx	#8
-	bne	copy_blank_loop
 	
 	ldx	#0
 copy_letters:
@@ -132,14 +140,7 @@ copy_letters:
 	inx
 	cpx	#27
 	bne	copy_letters
-start_clr:
-        lda     #46
-        ldx     #0
-start_clr_loop:
-        sta     $1e00,x
-        sta     $1f00,x
-        inx
-        bne     start_clr_loop
+
         rts
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

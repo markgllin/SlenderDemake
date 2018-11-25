@@ -4,13 +4,29 @@ end_screen:
 
 	jsr	prep_splash_screen
 
+	lda	#$1f
+	sta	SCRN_OFFSET_MSB	
+
+	lda	GAME_STATUS
+	cmp	#NUM_ZERO
+	beq	you_lose
+
 	lda     #<win_message	        ; get low byte of message address to print
 	sta	MSG_ADDR_LSB
 	lda     #>win_message	        ; get high byte of message address to print
 	sta	MSG_ADDR_MSB
-	lda	#$1f
-	sta	SCRN_OFFSET_MSB
-	lda	#$38
+	lda	#$39
+	sta	SCRN_OFFSET_LSB
+	jsr	print_message
+	
+	jmp	forever
+
+you_lose:
+	lda     #<lose_message	        ; get low byte of message address to print
+	sta	MSG_ADDR_LSB
+	lda     #>lose_message	        ; get high byte of message address to print
+	sta	MSG_ADDR_MSB
+	lda	#$3a
 	sta	SCRN_OFFSET_LSB
 	jsr	print_message
 

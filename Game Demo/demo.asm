@@ -96,6 +96,7 @@ init_all_the_things:
         sta     CLRM_LSB
 	sta     NUM_WRAPS
 	sta     ANIMATE_STATUS
+	sta	GAME_STATUS	; if non-zero, then end the game
 
         lda     #$12		; 4 characters away from right top corner
         sta     SCORE_LSB	; position of the score on screen 
@@ -115,10 +116,6 @@ init_all_the_things:
         lda     #$03
         sta     SPRITE_X
 
-        ;; init all the other things
-        lda     #$ff
-        sta     GAME_STATUS	; if 0, then end game
-
         lda     #ANIMATION_DELAY
         sta     ANIMATE_COUNT 	; controls animation of sprite
 
@@ -134,8 +131,8 @@ init_all_the_things:
 init_timer_and_score_loop:
 	; font colour should still be white from start screen
         lda     #NUM_ZERO        ; number 0
-        sta     SCRN_MEM1,X      ; position of timer
-	sta	SCRN_MEM1+#$12,X ; position of score
+        sta     TIMER_ADDRESS,X  ; position of timer
+	sta	SCORE_ADDRESS,X  ; position of score
         inx
         cpx     #$04
         bne     init_timer_and_score_loop
@@ -143,7 +140,12 @@ init_timer_and_score_loop:
 	;; make timer 0300 instead of 0000 from init above
         ldy     #$03		; third digit
         lda     #NUM_ZERO + 3   ; number 3
-        sta     (SCRN_LSB),y
+        sta     TIMER_ADDRESS,y
+
+	;; check win condition by automatically setting score
+	; ldy     #$00		    ; fourth digit
+        ; lda     #NUM_ZERO + 1     ; number 1
+        ; sta     SCORE_ADDRESS,y
 
 place_character_sprite:
         lda     #$2e            ; offset sprite
@@ -167,7 +169,7 @@ start_timers:
 input:
         ;; check game status FIRST
         lda     GAME_STATUS
-        bne     continue_game
+        beq     continue_game
         jsr     end_game
 
 continue_game:

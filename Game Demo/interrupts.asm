@@ -27,7 +27,7 @@ isr_manager:
 
 	;; check end game condition in case it's already end game
         lda     GAME_STATUS
-        beq	done_interrupt
+        bne	done_interrupt	; game is over if non-zero, so stop custom interrupts
 
 check_timer2:
         ;; check that the interrupt is happening from timer 2
@@ -133,8 +133,9 @@ isr_trigger_end_game:
         ldy     #03
         sta     (SCRN_LSB),y
 
-        lda     #$0
-        sta     GAME_STATUS
+	ldx	#$00			; check fourth digit
+	lda	SCORE_ADDRESS,x
+        sta     GAME_STATUS		; if 0, then lose (i.e score < 1000). Else, win
 
         jmp     check_timer1
 
@@ -145,7 +146,7 @@ isr_update_music:
 	;;  restart the timer
         jsr	start_timer1
 
-        dec     S1_DUR          ; single sixteenth note has passed
+        dec     S1_DUR         	; single sixteenth note has passed
         bne     check_S3        ; if not zero, don't change the note and check next voice
 change_S1:
         ;; move the S1 pointer to the next note

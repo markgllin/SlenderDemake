@@ -5,7 +5,7 @@ SCRN_MSB        = $01           ; MSB Of screen memory address
 CLRM_LSB        = $04           ; LSB of colour memory address
 CLRM_MSB        = $05           ; MSB Of colour memory address
 
-GAME_STATUS     = $07           ; if this is 0, end game
+GAME_STATUS     = $07           ; if this is not 0, end game
 
 CURR_SPRITE     = $08           ; stores the starting character for current sprite
 FRAME           = $09           ; frame counter for delays
