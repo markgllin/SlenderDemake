@@ -62,14 +62,13 @@ subOffset       subroutine
 
 
 startFrame      subroutine
-        lda     #$00
-        sta     FRAME
+        ldx     #$00
+        stx     FRAME
 .frame:
         lda     RASTER          ; raster beam line number
         bne     .frame
-        inc     FRAME           ; increase frame counter
-        lda     FRAME
-        cmp     #$15            ; add delay
+        inx                ; increase frame counter
+        cpx     #$19            ; add delay
         bne     .frame
         rts
 

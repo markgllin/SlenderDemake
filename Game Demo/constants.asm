@@ -39,8 +39,8 @@ TIMER2_H        = $9119         ; timer 2 high order byte
 
 ;;; CUSTOM CHARSET ADDRESSES
 SPACE_ADDRESS   = $1c00         ; where the space character starts
-SPRITE_ADDRESS  = $1c30         ; where the sprites start
-TREE_ADDRESS    = $1d30         ; where the tree starts
+SPRITE_ADDRESS  = $1c30         ; where the sprites start (7216)
+TREE_ADDRESS    = $1d30         ; where the tree starts (7472)
 NUMBERS_ADDRESS = $1d60         ; where numbers start in custom charset
 
 TIMER_ADDRESS 	= $1e00

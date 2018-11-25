@@ -15,6 +15,12 @@ generateMaze    subroutine
 
 .carveMaze
         jsr     random
+
+        ldy     ROOM_SEED
+        cpy     #0
+        bne     .seedSet
+        sta     ROOM_SEED
+.seedSet
         and     #3
         sta     MAZE_DIR
 
@@ -50,19 +56,34 @@ generateMaze    subroutine
 .updateWestCell
         dec_maze_coord MAZE_X_COORD, #4
         sta     MAZE_X_COORD
-        load_maze_offsets #(X_OFFSET * 2), subOffset
+        lda     #(X_OFFSET * 2)
+        jsr     loadMazeOffsets
+        jsr     subOffset
+
         store_maze_offsets
         jsr     drawPath
-        load_maze_offsets #(X_OFFSET * 2), subOffset
+
+        lda     #(X_OFFSET * 2)
+        jsr     loadMazeOffsets
+        jsr     subOffset
+
         ldx     #WEST
         jmp     .updateCell
 .updateNorthCell
         dec_maze_coord MAZE_Y_COORD, #4
         sta     MAZE_Y_COORD
-        load_maze_offsets #(Y_OFFSET * 2), subOffset
+
+        lda     #(Y_OFFSET * 2)
+        jsr     loadMazeOffsets
+        jsr     subOffset
+
         store_maze_offsets
         jsr     drawPath
-        load_maze_offsets #(Y_OFFSET * 2), subOffset
+
+        lda     #(Y_OFFSET * 2)
+        jsr     loadMazeOffsets
+        jsr     subOffset
+
         ldx     #NORTH
         jmp     .updateCell
 .updateEast
@@ -70,20 +91,36 @@ generateMaze    subroutine
 .updateSouthCell
         inc_maze_coord MAZE_Y_COORD, #4
         sta     MAZE_Y_COORD
-        load_maze_offsets #(Y_OFFSET * 2), addOffset
+
+        lda     #(Y_OFFSET * 2)
+        jsr     loadMazeOffsets
+        jsr     addOffset
+
         store_maze_offsets
         jsr     drawPath
-        load_maze_offsets #(Y_OFFSET * 2), addOffset
+
+        lda     #(Y_OFFSET * 2)
+        jsr     loadMazeOffsets
+        jsr     addOffset
+
         ldx     #SOUTH
         jmp     .updateCell
 .updateEastCell
         inc_maze_coord MAZE_X_COORD, #4
         sta     MAZE_X_COORD
 
-        load_maze_offsets #(X_OFFSET * 2), addOffset
+
+        lda     #(X_OFFSET * 2)
+        jsr     loadMazeOffsets
+        jsr     addOffset
+
         store_maze_offsets
         jsr     drawPath
-        load_maze_offsets #(X_OFFSET * 2), addOffset
+
+        lda     #(X_OFFSET * 2)
+        jsr     loadMazeOffsets
+        jsr     addOffset
+
         ldx     #EAST
 .updateCell
         store_maze_offsets
@@ -94,11 +131,20 @@ generateMaze    subroutine
 doneMaze        subroutine
         jsr     drawPath
 
+        lda     CURR_ROOM
+        cmp     #1
+        beq     .drawExit
+
         lda     #MAZE_ENTRANCE_LSB
         sta     MAZE_LSB
         lda     #MAZE_ENTRANCE_MSB
         sta     MAZE_MSB
         jsr     drawPath
+
+.drawExit
+        lda     CURR_ROOM
+        cmp     #$80
+        beq     .placeObjects
 
         lda     #MAZE_EXIT_LSB
         sta     MAZE_LSB
@@ -106,6 +152,7 @@ doneMaze        subroutine
         sta     MAZE_MSB
         jsr     drawPath
 
+.placeObjects
         jsr     maskTrees
         jsr     place_letter
         rts
@@ -130,25 +177,38 @@ backtrack       subroutine
 .bkTrackEast
         inc_maze_coord MAZE_X_COORD, #4
         sta     MAZE_X_COORD
-        load_maze_offsets #(X_OFFSET * 4), addOffset
+
+        lda     #(X_OFFSET * 4)
+        jsr     loadMazeOffsets
+        jsr     addOffset
+
         jmp     .updateAddress
 .bkTrackSouth
         inc_maze_coord MAZE_Y_COORD, #4
         sta     MAZE_Y_COORD
 
-        load_maze_offsets #(Y_OFFSET * 4), addOffset
+        lda     #(Y_OFFSET * 4)
+        jsr     loadMazeOffsets
+        jsr     addOffset
+
         jmp     .updateAddress
 .bkTrackNorth
         dec_maze_coord MAZE_Y_COORD, #4
         sta     MAZE_Y_COORD
 
-        load_maze_offsets #(Y_OFFSET * 4), subOffset
+        lda     #(Y_OFFSET * 4)
+        jsr     loadMazeOffsets
+        jsr     subOffset
+
         jmp     .updateAddress
 .bkTrackWest
         dec_maze_coord MAZE_X_COORD, #4
         sta     MAZE_X_COORD
 
-        load_maze_offsets #(X_OFFSET * 4), subOffset
+        lda     #(X_OFFSET * 4)
+        jsr     loadMazeOffsets
+        jsr     subOffset
+
 .updateAddress
         sta     MAZE_MSB
         lda     LSB
@@ -170,7 +230,9 @@ isCellValid     subroutine
         dec_maze_coord MAZE_X_COORD, #4
         bmi     .invalidCell
 
-        load_maze_offsets #(X_OFFSET * 4), subOffset
+        lda     #(X_OFFSET * 4)
+        jsr     loadMazeOffsets
+        jsr     subOffset
 
         ldy     #0
         lda     (LSB),y
@@ -180,7 +242,9 @@ isCellValid     subroutine
         dec_maze_coord MAZE_Y_COORD, #4
         bmi     .invalidCell
 
-        load_maze_offsets #(Y_OFFSET * 4), subOffset
+        lda     #(Y_OFFSET * 4)
+        jsr     loadMazeOffsets
+        jsr     subOffset
 
         ldy     #0
         lda     (LSB),y
@@ -192,7 +256,9 @@ isCellValid     subroutine
         beq     .contSouth
         bcs     .invalidCell
 .contSouth
-        load_maze_offsets #(Y_OFFSET * 4), addOffset
+        lda     #(Y_OFFSET * 4)
+        jsr     loadMazeOffsets
+        jsr     addOffset
 
         ldy     #0
         lda     (LSB),y
@@ -204,7 +270,9 @@ isCellValid     subroutine
         beq     .contEast
         bcs     .invalidCell
 .contEast
-        load_maze_offsets #(X_OFFSET * 4), addOffset
+        lda     #(X_OFFSET * 4)
+        jsr     loadMazeOffsets
+        jsr     addOffset
 
         ldy     #0
         lda     (LSB),y
@@ -352,6 +420,9 @@ checkDoorways   subroutine
 
         lda     #MAZE_ENTRANCE_MSB
         sta     SPRITE_MSB
+
+        asl     CURR_ROOM
+
         jmp     .makeMaze
 .newMazeRight
         lda     #MAZE_EXIT_X_COORD
@@ -363,8 +434,16 @@ checkDoorways   subroutine
 
         lda     #MAZE_EXIT_MSB
         sta     SPRITE_MSB
+
+        lsr     CURR_ROOM
 .makeMaze
         jsr     clr
         jsr     generateMaze
 .keepMaze
+        rts
+
+loadMazeOffsets subroutine
+        sta     OFFSET
+        lda     MAZE_LSB
+        ldx     MAZE_MSB
         rts

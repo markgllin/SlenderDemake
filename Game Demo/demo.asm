@@ -97,6 +97,8 @@ init_all_the_things:
 	sta     NUM_WRAPS
 	sta     ANIMATE_STATUS
 	sta	GAME_STATUS	; if non-zero, then end the game
+        sta     ROOM_SEED
+        sta     LETTER_STATE
 
         lda     #$12		; 4 characters away from right top corner
         sta     SCORE_LSB	; position of the score on screen 
@@ -111,10 +113,13 @@ init_all_the_things:
         sta     SPRITE_CLR_MSB
         
 	;; init the position of the sprite at spawn
-        lda     #$01
-        sta     SPRITE_Y
         lda     #$03
         sta     SPRITE_X
+        lda     #$01
+        sta     SPRITE_Y
+        
+        ;; init starting room
+        sta     CURR_ROOM
 
         lda     #ANIMATION_DELAY
         sta     ANIMATE_COUNT 	; controls animation of sprite

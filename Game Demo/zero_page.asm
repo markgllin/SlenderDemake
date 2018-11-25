@@ -66,6 +66,10 @@ MOD_FLAG        = $35
 ANIMATE_COUNT   = $36
 ANIMATE_STATUS  = $37
 
+ROOM_SEED       = $38
+CURR_ROOM       = $39
+LETTER_STATE    = $3a
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;            SPLASH SCREENS              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
