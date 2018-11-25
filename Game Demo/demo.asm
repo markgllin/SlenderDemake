@@ -143,7 +143,8 @@ init_timer_and_score_loop:
         bne     init_timer_and_score_loop
 
 	;; make timer 0300 instead of 0000 from init above
-        ldy     #$03		; third digit
+        ldy     #$01		; third digit
+	; ldy	#$03		; for debug of end screen - make it 3 seconds instead of 300
         lda     #NUM_ZERO + 3   ; number 3
         sta     TIMER_ADDRESS,y
 
