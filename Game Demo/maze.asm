@@ -15,14 +15,18 @@ generateMaze    subroutine
         lda     #MAZE_ORIGIN
         sta     $1e2e
 
+.setSeed
+        lda     ROOM_SEED
+        sta     LFSR
+        ldx     #0
+.cycleSeeds
+        jsr     random
+        inx
+        cpx     CURR_ROOM
+        bne     .cycleSeeds
+
 .carveMaze
         jsr     random
-
-        ldy     ROOM_SEED
-        cpy     #0
-        bne     .seedSet
-        sta     ROOM_SEED
-.seedSet
         and     #3
         sta     MAZE_DIR
 

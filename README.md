@@ -8,7 +8,7 @@ TODO:
   That is honestly a pretty minor detail though; more just annoying work than an actual hard thing. 
   Once game is closer to being "done" we can focus on this.
   
-- multiple rooms - in progress
+- ~~multiple rooms~~
 
 - ~~collision detection~~
 - ~~title screen~~
@@ -23,11 +23,11 @@ TODO:
 
 FIXES:
 - fix timer + score after changing rooms (i.e. fix clear screen subroutine)
-- fix letter generation/placement + remember if letter has been found in a room 
+- ~~fix letter generation/placement + remember if letter has been found in a room~~ DONE :)
 - OPTIMIZE, OPTIMIZE, OPTIMIZE
 
 Maybes
-- remember if a room has been visited
+- ~~remember if a room has been visited~~
 - text box (e.g. 'You here some rustling')
 - add slenderman
 - cheat codes
@@ -37,8 +37,6 @@ Maybes
 
 Possible Optimizations:
 - use same add/subOffset macro/routines
-- set 'blank' character to something NOT 0. Set PATH tile to 0 so that we can omit a
-  cmp everytime player moves (not as simple as actually swapping the values. Some 
+- set 'blank' character to something NOT 0. Set PATH tile to 0 so that we can omit a cmp everytime player moves (not as simple as actually swapping the values. Some 
   debugging required) 
-- do we really need a `SPRITE_LSB/MSB` and `SPRITE_CLR_LSB/MSB`? as far I can tell, they're always equivalent?
 - i think...we can modify the sub/addoffset subroutines to use indirect indexing and get rid of the garbage math w/ updating lsb and msb's separately...dont fix what's not broken though ¯\_(ツ)_/¯. will deal with it when i have time

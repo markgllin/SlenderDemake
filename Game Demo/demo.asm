@@ -94,7 +94,6 @@ init_all_the_things:
 	sta     NUM_WRAPS
 	sta     ANIMATE_STATUS
 	sta	GAME_STATUS	; if non-zero, then end the game
-        sta     ROOM_SEED
         sta     LETTER_STATE
 
         lda     #$12		; 4 characters away from right top corner
@@ -149,6 +148,9 @@ init_timer_and_score_loop:
 	; ldy     #$00		    ; fourth digit
         ; lda     #NUM_ZERO + 1     ; number 1
         ; sta     SCORE_ADDRESS,y
+
+        jsr     random
+        lda     ROOM_SEED
 
 place_character_sprite:
         jsr     generateMaze
