@@ -93,9 +93,7 @@ init_all_the_things:
         ;; load 0 everywhere that needs it
         lda     #$00            
         sta     SCRN_LSB
-        sta     SPRITE_LSB
         sta     CLRM_LSB
-        sta     SPRITE_CLR_LSB
 	sta     NUM_WRAPS
 	sta     ANIMATE_STATUS
 
@@ -158,7 +156,7 @@ place_character_sprite:
         sta     CURR_SPRITE
         draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
 
-	jsr	place_letter	; place letter in first room
+
 	jsr     draw_env	; draw environment around sprite
 
 start_timers:

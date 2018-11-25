@@ -33,10 +33,10 @@ done_animate:
 
 ;;; ----- DRAWING ROUTINES
 
-place_letter: ; ************** CHANGE THIS ****************        
+place_letter: 
+	jsr     random
 	lda	LFSR			
-	
-	and	#$fe			; force even to avoid clipping through trees
+	and	#$fe			; This avoids clipping through trees
 
         sta     LETTER_LSB
         sta     LETTER_CLR_LSB
@@ -58,30 +58,27 @@ letter_lower_half:
 	sta	LETTER_CLR_MSB
 
 spawn_letter:
-	ldy     #$ff
-find_valid_letter_placement:
-	iny
+        ldy     #$0
         lda     (LETTER_LSB),y
         cmp     #PATH
-        bne     find_valid_letter_placement
-	iny
-	lda	(LETTER_LSB),y
-	cmp	#PATH
-	bne     find_valid_letter_placement
+        bne     place_letter
 
-        ldy     #$0
-        lda     #ITEM_LETTER
+	lda     #ITEM_LETTER
         sta     (LETTER_LSB),y
-        lda     #$01
+	lda     #$01
         sta     (LETTER_CLR_LSB),y
 
-        iny
+        ldy     #$1
+        lda     (LETTER_LSB),y
+        cmp     #PATH
+        bne     place_letter
+
         lda     #ITEM_LETTER + 1
         sta     (LETTER_LSB),y
         lda     #$01
         sta     (LETTER_CLR_LSB),y
 
-        rts
+	rts
 
 erase:
         erase_char #PATH, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
