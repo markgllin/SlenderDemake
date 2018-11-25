@@ -131,7 +131,8 @@ generateMaze    subroutine
 .updateCell
         store_maze_offsets
         TXA
-        jsr     drawCell
+        ldy     #0
+        sta     (MAZE_LSB),y
         jmp     .carveMaze
 
 doneMaze        subroutine
@@ -310,12 +311,6 @@ drawPath        subroutine
         lda     #PATH
         sta     (MAZE_LSB),y
         iny
-        sta     (MAZE_LSB),y
-        rts
-
-; needs character to draw in accumulator
-drawCell        subroutine
-        ldy     #0
         sta     (MAZE_LSB),y
         rts
 
