@@ -107,15 +107,10 @@ init_all_the_things:
         sta     SPRITE_MSB
         sta     SCORE_MSB
 
-        lda     #$1f		; ************** CHANGE THIS ****************
-        sta     LETTER_MSB
-
         lda     #$96
         sta     CLRM_MSB
         sta     SPRITE_CLR_MSB
-        lda     #$97		; ************** CHANGE THIS ****************
-        sta     LETTER_CLR_MSB
-
+        
 	;; init the position of the sprite at spawn
         lda     #$01
         sta     SPRITE_Y
