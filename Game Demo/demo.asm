@@ -58,9 +58,6 @@ copy_blank:
 ; 	cpx	#48
 ; 	bne	copy_blank3_debug
 
-        jsr     clr
-        jsr     generateMaze
-
         ;; character sprites = first 256 bytes
         ldx     #00
 copy_sprites:
@@ -154,6 +151,7 @@ init_timer_and_score_loop:
         ; sta     SCORE_ADDRESS,y
 
 place_character_sprite:
+        jsr     generateMaze
         lda     #$2e            ; offset sprite
         sta     SPRITE_LSB
         sta     SPRITE_CLR_LSB

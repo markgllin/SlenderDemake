@@ -1,5 +1,7 @@
 ; maze setup
 generateMaze    subroutine
+        jsr     clr
+
         lda     #2              ; need to randomize this some how
         sta     MAZE_X_COORD
         sta     MAZE_Y_COORD
