@@ -123,14 +123,6 @@ fill_colour_mem:		; fill colour memory with white
 	sta	COLOR_MEM+#$ff,X
 	inx
 	bne	fill_colour_mem
-	
-	ldx	#0
-copy_letters:
-	lda	ALPHABET_ROM,X
-	sta	logo_end,X
-	inx
-	cpx	#152
-	bne	copy_letters
 
         rts
 
