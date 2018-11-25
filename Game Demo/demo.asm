@@ -35,6 +35,13 @@ copy_blank:
         cpx     #48
         bne     copy_blank
 
+        lda     #CLEAR_CHAR
+        ldx     #0
+.clrloop:
+        sta     $1e00,x
+        sta     $1f00,x
+        inx
+        bne     .clrloop
 ; ; COMMENT out copy_blank and uncomment copy_blank_debug
 ; ; and copy_blank2_debug to debug with maze visible
 ; ; copy_blank3_debug is only for seeing area beyond path - can ignore for the most part
@@ -180,7 +187,15 @@ input:
 
 continue_game:
         ;; not end game so continue
-        jsr     startFrame
+        ldx     #$00
+        stx     FRAME
+.frame:
+        lda     RASTER          ; raster beam line number
+        bne     .frame
+        inx                ; increase frame counter
+        cpx     #$19            ; add delay
+        bne     .frame
+        
         lda     SCAN_KEYBOARD
         cmp     #W_KEY
         beq     up
