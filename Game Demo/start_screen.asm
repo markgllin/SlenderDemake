@@ -46,8 +46,7 @@ print_logo_column:
 start_input:
 	inc	MAZE_SEED
 	jsr	random
-	lda	LFSR
-	cmp	#248
+	cmp	#20
 	bne	no_glitch
 
 	jsr	glitch	
