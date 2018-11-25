@@ -134,27 +134,6 @@ init_all_the_things:
         jsr	restart_song
 	jsr	play_notes
 
-        ;; initialize the timer to 0300 and the score to 0000
-        ldx     #$0
-init_timer_and_score_loop:
-	; font colour should still be white from start screen
-        lda     #NUM_ZERO        ; number 0
-        sta     TIMER_ADDRESS,X  ; position of timer
-	sta	SCORE_ADDRESS,X  ; position of score
-        inx
-        cpx     #$04
-        bne     init_timer_and_score_loop
-
-	;; make timer 0300 instead of 0000 from init above
-        ldy     #$01		; third digit
-	; ldy	#$03		; for debug of end screen - make it 3 seconds instead of 300
-        lda     #NUM_ZERO + 3   ; number 3
-        sta     TIMER_ADDRESS,y
-
-	;; check win condition by automatically setting score
-	; ldy     #$00		    ; fourth digit
-        ; lda     #NUM_ZERO + 1     ; number 1
-        ; sta     SCORE_ADDRESS,y
 
         jsr     random
         sta     ROOM_SEED
@@ -173,6 +152,30 @@ place_character_sprite:
 
 
 	jsr     draw_env	; draw environment around sprite
+
+        ;; initialize the timer to 0300 and the score to 0000
+        ldx     #$0
+init_timer_and_score_loop:
+	; font colour should still be white from start screen
+        lda     #NUM_ZERO        ; number 0
+        sta     TIMER_ADDRESS,X  ; position of timer
+	sta	SCORE_ADDRESS,X  ; position of score
+	lda	#01
+	sta	$9600,X
+        inx
+        cpx     #$04
+        bne     init_timer_and_score_loop
+
+	;; make timer 0300 instead of 0000 from init above
+        ldy     #$01		; third digit
+	; ldy	#$03		; for debug of end screen - make it 3 seconds instead of 300
+        lda     #NUM_ZERO + 3   ; number 3
+        sta     TIMER_ADDRESS,y
+
+	;; check win condition by automatically setting score
+	; ldy     #$00		    ; fourth digit
+        ; lda     #NUM_ZERO + 1     ; number 1
+        ; sta     SCORE_ADDRESS,y
 
 start_timers:
         jsr	start_timer1

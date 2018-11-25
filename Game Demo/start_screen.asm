@@ -154,7 +154,7 @@ message:		; "PRESS SPACE TO START"  -> 20 bytes
 	;   	T         O                S         T         A        R         T
 	dc.b	20+#$180, 15+#$180,   #46, 19+#$180, 20+#$180, 1+#$180, 18+#$180, 20+#$180, END_BYTE
 
-; zz_end
+ZZZ_END:
 
 	org 	CHAR_MEM	; naughty trick - just load right into custom character set
 logo:				; total: 45 characters = 360 bytes
@@ -205,4 +205,3 @@ logo:				; total: 45 characters = 360 bytes
 	dc.b 32,32,32,32,32,96,64,64		; 1d58
 	dc.b 0,0,0,0,0,0,0,220			; 1d60
 	dc.b 148,156,144,156,0,0,0,0		; 1d68
-
