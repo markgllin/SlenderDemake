@@ -1,7 +1,5 @@
 ; maze setup
 generateMaze    subroutine
-        jsr     clr
-
         lda     #2              ; need to randomize this some how
         sta     MAZE_X_COORD
         sta     MAZE_Y_COORD
@@ -136,7 +134,8 @@ generateMaze    subroutine
 .updateCell
         store_maze_offsets
         TXA
-        jsr     drawCell
+        ldy     #0
+        sta     (MAZE_LSB),y
         jmp     .carveMaze
 
 doneMaze        subroutine
@@ -318,12 +317,6 @@ drawPath        subroutine
         sta     (MAZE_LSB),y
         rts
 
-; needs character to draw in accumulator
-drawCell        subroutine
-        ldy     #0
-        sta     (MAZE_LSB),y
-        rts
-
 maskTrees       subroutine
         lda     #0
         sta     MAZE_X_COORD
@@ -453,7 +446,6 @@ checkDoorways   subroutine
 
         lsr     CURR_ROOM
 .makeMaze
-        jsr     clr
         jsr     generateMaze
 .keepMaze
         rts

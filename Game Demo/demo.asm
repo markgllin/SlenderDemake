@@ -14,6 +14,9 @@ end:
 
 	lda     #255            ; custom character set
         sta     $9005
+	lda	28
+	sta	56
+	sta	58
 
         ;; set up the interrupts
 	jsr	start_screen
@@ -35,28 +38,35 @@ copy_blank:
         cpx     #48
         bne     copy_blank
 
-; COMMENT out copy_blank and uncomment copy_blank_debug
-; and copy_blank2_debug to debug with maze visible
-; copy_blank3_debug is only for seeing area beyond path - can ignore for the most part
-copy_blank_debug:
-	sta	SPACE_ADDRESS,X
-	inx
-	cpx	#8
-	bne	copy_blank_debug
+        lda     #CLEAR_CHAR
+        ldx     #0
+.clrloop:
+        sta     $1e00,x
+        sta     $1f00,x
+        inx
+        bne     .clrloop
+; ; COMMENT out copy_blank and uncomment copy_blank_debug
+; ; and copy_blank2_debug to debug with maze visible
+; ; copy_blank3_debug is only for seeing area beyond path - can ignore for the most part
+; copy_blank_debug:
+; 	sta	SPACE_ADDRESS,X
+; 	inx
+; 	cpx	#8
+; 	bne	copy_blank_debug
 
-	lda	#$ff
-copy_blank2_debug:
-	sta	SPACE_ADDRESS,X
-	inx
-	cpx	#16
-	bne	copy_blank2_debug
+; 	lda	#$ff
+; copy_blank2_debug:
+; 	sta	SPACE_ADDRESS,X
+; 	inx
+; 	cpx	#16
+; 	bne	copy_blank2_debug
 
-	lda	#$00
-copy_blank3_debug:
-	sta	SPACE_ADDRESS,X
-	inx
-	cpx	#48
-	bne	copy_blank3_debug
+; 	lda	#$00
+; copy_blank3_debug:
+; 	sta	SPACE_ADDRESS,X
+; 	inx
+; 	cpx	#48
+; 	bne	copy_blank3_debug
 
         ;; character sprites = first 256 bytes
         ldx     #00
@@ -127,27 +137,6 @@ init_all_the_things:
         jsr	restart_song
 	jsr	play_notes
 
-        ;; initialize the timer to 0300 and the score to 0000
-        ldx     #$0
-init_timer_and_score_loop:
-	; font colour should still be white from start screen
-        lda     #NUM_ZERO        ; number 0
-        sta     TIMER_ADDRESS,X  ; position of timer
-	sta	SCORE_ADDRESS,X  ; position of score
-        inx
-        cpx     #$04
-        bne     init_timer_and_score_loop
-
-	;; make timer 0300 instead of 0000 from init above
-        ldy     #$01		; third digit
-	; ldy	#$03		; for debug of end screen - make it 3 seconds instead of 300
-        lda     #NUM_ZERO + 3   ; number 3
-        sta     TIMER_ADDRESS,y
-
-	;; check win condition by automatically setting score
-	; ldy     #$00		    ; fourth digit
-        ; lda     #NUM_ZERO + 1     ; number 1
-        ; sta     SCORE_ADDRESS,y
 
         jsr     random
         sta     ROOM_SEED
@@ -167,6 +156,33 @@ place_character_sprite:
 
 	jsr     draw_env	; draw environment around sprite
 
+        ;; initialize the timer to 0300 and the score to 0000
+        ldx     #$0
+init_timer_and_score_loop:
+	; font colour should still be white from start screen
+        lda     #NUM_ZERO        ; number 0
+        sta     TIMER_ADDRESS,X  ; position of timer
+	sta	SCORE_ADDRESS,X  ; position of score
+	lda	#01
+	sta	$9600,X
+        inx
+        cpx     #$04
+        bne     init_timer_and_score_loop
+
+	;; make timer 0300 instead of 0000 from init above
+        ldy     #$01		; third digit
+	; ldy	#$03		; for debug of end screen - make it 3 seconds instead of 300
+        lda     #NUM_ZERO + 3   ; number 3
+        sta     TIMER_ADDRESS,y
+
+	;; check win condition by automatically setting score
+	; ldy     #$00		    ; fourth digit
+        ; lda     #NUM_ZERO + 1     ; number 1
+        ; sta     SCORE_ADDRESS,y
+
+        jsr     random
+        sta     ROOM_SEED
+
 start_timers:
         jsr	start_timer1
 	jsr	start_timer2
@@ -180,7 +196,15 @@ input:
 
 continue_game:
         ;; not end game so continue
-        jsr     startFrame
+        ldx     #$00
+        stx     FRAME
+.frame:
+        lda     RASTER          ; raster beam line number
+        bne     .frame
+        inx                ; increase frame counter
+        cpx     #$19            ; add delay
+        bne     .frame
+        
         lda     SCAN_KEYBOARD
         cmp     #W_KEY
         beq     up

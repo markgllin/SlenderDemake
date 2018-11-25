@@ -1,16 +1,5 @@
 ; COMMON SUBROUTINES
 
-;clears screen
-clr             subroutine
-        lda     #CLEAR_CHAR
-        ldx     #0
-.clrloop:
-        sta     $1e00,x
-        sta     $1f00,x
-        inx
-        bne     .clrloop
-        rts
-
 ; random value returned in accumulator
 ; and stored in LFSR (mem address)
 ; alters Y register and accumulator
@@ -61,16 +50,16 @@ subOffset       subroutine
         rts
 
 
-startFrame      subroutine
-        ldx     #$00
-        stx     FRAME
-.frame:
-        lda     RASTER          ; raster beam line number
-        bne     .frame
-        inx                ; increase frame counter
-        cpx     #$19            ; add delay
-        bne     .frame
-        rts
+; startFrame      subroutine
+;         ldx     #$00
+;         stx     FRAME
+; .frame:
+;         lda     RASTER          ; raster beam line number
+;         bne     .frame
+;         inx                ; increase frame counter
+;         cpx     #$19            ; add delay
+;         bne     .frame
+;         rts
 
 ; displays player coordinates in bottom left corner
 ; debugCoordinates

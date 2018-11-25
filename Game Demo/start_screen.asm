@@ -105,15 +105,7 @@ glitch_undo:
 ;; preps for a splash screen by setting the correct colours, clearing
 ;; the entire screen, and copying the necessary characters
 prep_splash_screen:
-	ldx	#00
-	lda	#00
-copy_blank_loop:		; make sure blank character is where it should be
-	sta	CHAR_MEM+#$170,X
-	inx	
-	cpx	#8
-	bne	copy_blank_loop
-
-        lda     #46
+        lda     #20
         ldx     #0
 start_clr_loop:
         sta     $1e00,x
@@ -131,14 +123,6 @@ fill_colour_mem:		; fill colour memory with white
 	sta	COLOR_MEM+#$ff,X
 	inx
 	bne	fill_colour_mem
-	
-	ldx	#0
-copy_letters:
-	lda	ALPHABET_ROM,X
-	sta	CHAR_MEM+#$178,X
-	inx
-	cpx	#27
-	bne	copy_letters
 
         rts
 
@@ -147,14 +131,14 @@ copy_letters:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 message:		; "PRESS SPACE TO START"  -> 20 bytes
-	;   	P         R         E        S         S        
-	dc.b	16+#$180, 18+#$180, 5+#$180, 19+#$180, 19+#$180, #46
-	;	S         P         A        C        E
-	dc.b	19+#$180, 16+#$180, 1+#$180, 3+#$180, 5+#$180, #46
-	;   	T         O                S         T         A        R         T
-	dc.b	20+#$180, 15+#$180,   #46, 19+#$180, 20+#$180, 1+#$180, 18+#$180, 20+#$180, END_BYTE
+	;   	P        R        E       S        S        
+	dc.b	16+#$80, 18+#$80, 5+#$80, 19+#$80, 19+#$80, #20
+	;	S        P        A       C       E
+	dc.b	19+#$80, 16+#$80, 1+#$80, 3+#$80, 5+#$80, #20
+	;   	T        O             S        T        A       R         T
+	dc.b	20+#$80, 15+#$80, #20, 19+#$80, 20+#$80, 1+#$80, 18+#$80, 20+#$80, END_BYTE
 
-; zz_end
+ZZZ_END:
 
 	org 	CHAR_MEM	; naughty trick - just load right into custom character set
 logo:				; total: 45 characters = 360 bytes
@@ -179,7 +163,7 @@ logo:				; total: 45 characters = 360 bytes
 	dc.b 112,112,112,112,120,126,56,56
 	dc.b 0,0,0,0,0,0,40,110
 	dc.b 42,42,42,42,0,0,0,0		; 160 bytes - 20 char (19)
-	dc.b 0,0,0,0,0,0,0,0			
+	dc.b 0,0,0,0,0,0,0,0			; THIS CAN BE A CLEAR - 21 (20)
 	dc.b 3,7,31,63,32,96,64,124		
 	dc.b 76,68,96,96,120,60,56,56
 	dc.b 0,0,0,0,0,0,0,227			; 192 bytes - 24 char (23)
@@ -205,4 +189,4 @@ logo:				; total: 45 characters = 360 bytes
 	dc.b 32,32,32,32,32,96,64,64		; 1d58
 	dc.b 0,0,0,0,0,0,0,220			; 1d60
 	dc.b 148,156,144,156,0,0,0,0		; 1d68
-
+logo_end:
