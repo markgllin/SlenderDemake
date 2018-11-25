@@ -1,5 +1,13 @@
 ; maze setup
 generateMaze    subroutine
+        lda     #CLEAR_CHAR
+        ldx     #0
+.clrloop:
+        sta     $1e00,x
+        sta     $1f00,x
+        inx
+        bne     .clrloop
+
         lda     #2              ; need to randomize this some how
         sta     MAZE_X_COORD
         sta     MAZE_Y_COORD

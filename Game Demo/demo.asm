@@ -32,41 +32,34 @@ start:
         ;; load zeros into the "0" character of our custom charset
         ldx     #$00
         lda     #$00
-copy_blank:
-        sta     SPACE_ADDRESS,X
-        inx
-        cpx     #48
-        bne     copy_blank
+; copy_blank:
+;         sta     SPACE_ADDRESS,X
+;         inx
+;         cpx     #48
+;         bne     copy_blank
 
-        lda     #CLEAR_CHAR
-        ldx     #0
-.clrloop:
-        sta     $1e00,x
-        sta     $1f00,x
-        inx
-        bne     .clrloop
-; ; COMMENT out copy_blank and uncomment copy_blank_debug
-; ; and copy_blank2_debug to debug with maze visible
-; ; copy_blank3_debug is only for seeing area beyond path - can ignore for the most part
-; copy_blank_debug:
-; 	sta	SPACE_ADDRESS,X
-; 	inx
-; 	cpx	#8
-; 	bne	copy_blank_debug
+; COMMENT out copy_blank and uncomment copy_blank_debug
+; and copy_blank2_debug to debug with maze visible
+; copy_blank3_debug is only for seeing area beyond path - can ignore for the most part
+copy_blank_debug:
+	sta	SPACE_ADDRESS,X
+	inx
+	cpx	#8
+	bne	copy_blank_debug
 
-; 	lda	#$ff
-; copy_blank2_debug:
-; 	sta	SPACE_ADDRESS,X
-; 	inx
-; 	cpx	#16
-; 	bne	copy_blank2_debug
+	lda	#$ff
+copy_blank2_debug:
+	sta	SPACE_ADDRESS,X
+	inx
+	cpx	#16
+	bne	copy_blank2_debug
 
-; 	lda	#$00
-; copy_blank3_debug:
-; 	sta	SPACE_ADDRESS,X
-; 	inx
-; 	cpx	#48
-; 	bne	copy_blank3_debug
+	lda	#$00
+copy_blank3_debug:
+	sta	SPACE_ADDRESS,X
+	inx
+	cpx	#48
+	bne	copy_blank3_debug
 
         ;; character sprites = first 256 bytes
         ldx     #00
@@ -137,25 +130,6 @@ init_all_the_things:
         jsr	restart_song
 	jsr	play_notes
 
-
-        jsr     random
-        sta     ROOM_SEED
-
-place_character_sprite:
-        jsr     generateMaze
-        lda     #$2e            ; offset sprite
-        sta     SPRITE_LSB
-        sta     SPRITE_CLR_LSB
-
-        lda     #SPRITE_CHAR_COLOR
-        sta     CURR_CLR
-        lda     #CHAR_FORWARD
-        sta     CURR_SPRITE
-        draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
-
-
-	jsr     draw_env	; draw environment around sprite
-
         ;; initialize the timer to 0300 and the score to 0000
         ldx     #$0
 init_timer_and_score_loop:
@@ -182,6 +156,20 @@ init_timer_and_score_loop:
 
         jsr     random
         sta     ROOM_SEED
+
+place_character_sprite:
+        jsr     generateMaze
+        lda     #$2e            ; offset sprite
+        sta     SPRITE_LSB
+        sta     SPRITE_CLR_LSB
+
+        lda     #SPRITE_CHAR_COLOR
+        sta     CURR_CLR
+        lda     #CHAR_FORWARD
+        sta     CURR_SPRITE
+        draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
+
+	jsr     draw_env	; draw environment around sprite
 
 start_timers:
         jsr	start_timer1

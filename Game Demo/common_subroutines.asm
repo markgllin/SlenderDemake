@@ -49,6 +49,16 @@ subOffset       subroutine
         sta     MSB
         rts
 
+; ;clears screen
+; clr             subroutine
+;         lda     #CLEAR_CHAR
+;         ldx     #0
+; .clrloop:
+;         sta     $1e00,x
+;         sta     $1f00,x
+;         inx
+;         bne     .clrloop
+;         rts
 
 ; startFrame      subroutine
 ;         ldx     #$00
