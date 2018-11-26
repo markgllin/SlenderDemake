@@ -14,6 +14,7 @@ end:
 
 	lda     #255            ; custom character set
         sta     $9005
+
 	lda	28
 	sta	56
 	sta	58
@@ -99,10 +100,10 @@ init_all_the_things:
 	sta	GAME_STATUS	; if non-zero, then end the game
         sta     LETTER_STATE
 
-        lda     #$f6		; 4 characters away from right top corner
+        lda     #$f6		; 4 characters away from right bottom corner
         sta     SCORE_LSB	; position of the score on screen 
-	lda	#$e4
-	sta	SCRN_LSB
+	lda	#$e4		; 4 characters away from left bottom corner
+	sta	SCRN_LSB	; position of the timer on screen
 
         lda     #$1e            ; load MSB
         sta     SPRITE_MSB
@@ -142,8 +143,6 @@ init_timer_and_score_loop:
         lda     #NUM_ZERO        ; number 0
         sta     TIMER_ADDRESS,X  ; position of timer
 	sta	SCORE_ADDRESS,X  ; position of score
-	lda	#01
-	sta	$9600,X
         inx
         cpx     #$04
         bne     init_timer_and_score_loop
@@ -194,7 +193,7 @@ continue_game:
 .frame:
         lda     RASTER          ; raster beam line number
         bne     .frame
-        inx                ; increase frame counter
+        inx                	; increase frame counter
         cpx     #$19            ; add delay
         bne     .frame
         
@@ -237,7 +236,7 @@ left:
         sta     CURR_SPRITE
         jsr     checkDoorways
         jmp     doneInput
-right
+right:
         jsr     erase
         ldy     #1
         jsr     addSpriteOffset
@@ -267,5 +266,7 @@ end_game:
         INCLUDE "interrupts.asm"
         INCLUDE "sprites.asm"
         INCLUDE "music.asm"
+	INCLUDE "start_screen.asm"
 	INCLUDE	"end_screen.asm"
-	INCLUDE "start_screen.asm"  ;;; this MUST be last unless you want bad things to happen
+ZZZ_END:
+	INCLUDE	"logo_bitmap.asm"	;;; this MUST be last unless you want bad things to happen

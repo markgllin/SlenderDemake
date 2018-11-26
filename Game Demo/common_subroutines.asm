@@ -82,3 +82,51 @@ subOffset       subroutine
 ;        adc     #NUM_ZERO
 ;        sta     8165
 ;        rts
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;              SPLASHSCREENS               ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+; expects message address in MSG_ADDR_LSB/MSB
+; expects message offset in SCRN_OFFSET_LSB/MSB
+print_message:
+	ldy	#0
+print_message_loop:
+	lda	(MSG_ADDR_LSB),y		; grab index for characters
+	cmp	#END_BYTE
+	beq	done_printing
+
+	sta	(SCRN_OFFSET_LSB),y		; print message starting at $1f35 on screen
+	iny
+
+	jmp	print_message_loop
+
+done_printing:
+	rts
+
+;; preps for a splash screen by setting the correct colours, clearing
+;; the entire screen, and copying the necessary characters
+prep_splash_screen:
+        lda     #20
+        ldx     #0
+start_clr_loop:
+        sta     $1e00,x
+        sta     $1f00,x
+        inx
+        bne     start_clr_loop
+
+	lda     #8              ; border black, screen black (ref p. 265)
+        sta     SCR_C
+
+	ldx	#00		
+	lda	#01
+fill_colour_mem:		; fill colour memory with white
+	sta	COLOR_MEM,X
+	sta	COLOR_MEM+#$ff,X
+	inx
+	bne	fill_colour_mem
+
+        rts
+
+

@@ -17,9 +17,7 @@ end_screen:
 	sta	MSG_ADDR_MSB
 	lda	#$39
 	sta	SCRN_OFFSET_LSB
-	jsr	print_message
-	
-	jmp	forever
+	jmp	print
 
 you_lose:
 	lda     #<lose_message	        ; get low byte of message address to print
@@ -28,10 +26,16 @@ you_lose:
 	sta	MSG_ADDR_MSB
 	lda	#$3a
 	sta	SCRN_OFFSET_LSB
-	jsr	print_message
+	
+print:
+	jsr	print_message		; common subroutines
 
 forever:
 	jmp	forever
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                 DATA                   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 win_message:	;; YOU ESCAPED --> 11 bytes
 	;	Y	  O         U
