@@ -79,17 +79,6 @@ copy_others:
         cpx     #$30            ; 48
         bne     copy_others
 
-        ;; copy the numbers from memory
-        ;; a.k.a copy starting from $8000 + ($30 * 8) = $8000 + $180 = $8180
-        ;; Copy all 10 characters: 10 * 8 = 80 = $50 bytes to copy
-        ldx     #$0
-copy_numbers:
-        lda     $8180,X         ; copy the source to the destination
-        sta     NUMBERS_ADDRESS,X	; end of sprites
-        inx
-        cpx     #$50            ; copy characters 0-9
-        bne     copy_numbers
-
 init_all_the_things:
         ;; load 0 everywhere that needs it
         lda     #$00            

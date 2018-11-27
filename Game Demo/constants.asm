@@ -59,8 +59,9 @@ B_CHAR_RIGHT    = #$1e          ; Z = character facing right - blinking
 B_CHAR_LEFT     = #$22          ; UP = character facing left - blinking
 TREE1           = #$26          ; " = tree sprite
 ITEM_LETTER     = #$2a          ; & = letter sprite
-NUM_ZERO        = #$2c          ; ( = start of number 0
-NUM_NINE        = #$35          ; 1 = start of number 9
+
+NUM_ZERO        = #$B0          ; screen code for number 0
+NUM_NINE        = #$B9          ; screen code for number 9
 
 SPRITE_CHAR_COLOR = #$09        ; multi-colour white
 TREE_CHAR_COLOR = #$0d          ; multi-colour green
