@@ -70,15 +70,6 @@ copy_sprites:
         inx
         bne     copy_sprites
 
-        ;; copy remaining 48 bytes (tree and letter)
-        ; ldx     #00     ---> x is already 0 from above
-copy_others:
-        lda     tree1,X
-        sta     TREE_ADDRESS,X
-        inx
-        cpx     #$30            ; 48
-        bne     copy_others
-
 init_all_the_things:
         ;; load 0 everywhere that needs it
         lda     #$00            
@@ -258,4 +249,4 @@ end_game:
 	INCLUDE "start_screen.asm"
 	INCLUDE	"end_screen.asm"
 ZZZ_END:
-	INCLUDE	"logo_bitmap.asm"	;;; this MUST be last unless you want bad things to happen
+	INCLUDE	"preloaded_charset.asm"	;;; this MUST be last unless you want bad things to happen

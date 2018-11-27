@@ -40,8 +40,8 @@ TIMER2_H        = $9119         ; timer 2 high order byte
 ;;; CUSTOM CHARSET ADDRESSES
 SPACE_ADDRESS   = $1c00         ; where the space character starts
 SPRITE_ADDRESS  = $1c30         ; where the sprites start (7216)
-TREE_ADDRESS    = $1d30         ; where the tree starts (7472)
-NUMBERS_ADDRESS = $1d60         ; where numbers start in custom charset
+TREE_ADDRESS    = $1d70         ; where the tree starts (7472)
+
 
 TIMER_ADDRESS 	= $1fe4
 SCORE_ADDRESS   = $1ff6
@@ -49,22 +49,22 @@ SCORE_ADDRESS   = $1ff6
 ;;; ---- CONSTANTS
 
 SPACE           = #$00          ; @
-CHAR_FORWARD    = #$06          ; B = character facing forward
-CHAR_BCKWARD    = #$0a          ; F = character facing backward
-CHAR_RIGHT      = #$0e          ; J = character facing to the right
-CHAR_LEFT       = #$12          ; N = character facing to the left
-B_CHAR_FORWARD  = #$16          ; R = character facing forward - blinking
-B_CHAR_BCKWARD  = #$1a          ; V = character facing backward - blinking
-B_CHAR_RIGHT    = #$1e          ; Z = character facing right - blinking
-B_CHAR_LEFT     = #$22          ; UP = character facing left - blinking
-TREE1           = #$26          ; " = tree sprite
-ITEM_LETTER     = #$2a          ; & = letter sprite
+CHAR_FORWARD    = #$06          ; character facing forward
+CHAR_BCKWARD    = #$0a          ; character facing backward
+CHAR_RIGHT      = #$0e          ; character facing to the right
+CHAR_LEFT       = #$12          ; character facing to the left
+B_CHAR_FORWARD  = #$16          ; character facing forward - blinking
+B_CHAR_BCKWARD  = #$1a          ; character facing backward - blinking
+B_CHAR_RIGHT    = #$1e          ; character facing right - blinking
+B_CHAR_LEFT     = #$22          ; character facing left - blinking
+TREE1           = #$2d          ; tree sprite
+ITEM_LETTER     = #$31          ; letter sprite
 
 NUM_ZERO        = #$B0          ; screen code for number 0
 NUM_NINE        = #$B9          ; screen code for number 9
 
 SPRITE_CHAR_COLOR = #$09        ; multi-colour white
-TREE_CHAR_COLOR = #$0d          ; multi-colour green
+TREE_CHAR_COLOR   = #$0d          ; multi-colour green
 
 ANIMATION_DELAY = #$02          ; 2 seconds
 
@@ -105,7 +105,7 @@ MAZE_ENTRANCE_MSB = #$1e
 MAZE_EXIT_LSB   = #$dc
 MAZE_EXIT_MSB   = #$1e
 
-OFFSET_TO_TREES = #36
+OFFSET_TO_TREES = #43
 
 NORTH           = 1
 SOUTH           = 2
