@@ -106,6 +106,7 @@ init_all_the_things:
         ;; init starting room
         sta     CURR_ROOM
 
+	;; init all the other things
         lda     #ANIMATION_DELAY
         sta     ANIMATE_COUNT 	; controls animation of sprite
 
@@ -118,8 +119,10 @@ init_all_the_things:
 
         ;; initialize the timer to 0300 and the score to 0000
         ldx     #$0
-init_timer_and_score_loop:
-	; font colour should still be white from start screen
+init_timer_and_score_loop: 	
+	;; could use PRINT_STRING here but uses more bytes than doubling up
+	;; and printing both timer and score at the same time
+	;; Also, font colour should still be white from start screen - don't set
         lda     #NUM_ZERO        ; number 0
         sta     TIMER_ADDRESS,X  ; position of timer
 	sta	SCORE_ADDRESS,X  ; position of score

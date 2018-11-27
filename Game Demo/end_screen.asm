@@ -15,7 +15,7 @@ end_screen:
 	sta	MSG_ADDR_LSB
 	lda     #>win_message	        ; get high byte of message address to print
 	sta	MSG_ADDR_MSB
-	lda	#$39
+	lda	#$39			; offset message on screen
 	sta	SCRN_OFFSET_LSB
 	jmp	print
 
