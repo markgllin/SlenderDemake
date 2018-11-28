@@ -134,8 +134,8 @@ isr_trigger_end_game:
         sta     (SCRN_LSB),y
 
 	ldx	#$00			; check fourth digit
-	lda	#$00
-        sta     GAME_STATUS		; timer ran out, so zero (which means lose)
+	lda	#NUM_ZERO
+        sta     GAME_STATUS		; timer ran out, so NUM_ZERO (which means lose)
 
         jmp     check_timer1
 
