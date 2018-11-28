@@ -89,18 +89,25 @@ subOffset       subroutine
 
 
 ; expects message address in MSG_ADDR_LSB/MSB
-; expects message offset in SCRN_OFFSET_LSB/MSB
+; expects starting address of whhere to print on screen as first two bytes of data
+; expects message to end with constant END_BYTE
 print_message:
 	ldy	#0
+	lda	(MSG_ADDR_LSB),y
+	sta	SCRN_OFFSET_MSB
+	iny
+	lda	(MSG_ADDR_LSB),y
+	sta	SCRN_OFFSET_LSB
+	iny
 print_message_loop:
 	lda	(MSG_ADDR_LSB),y		; grab index for characters
-	cmp	#END_BYTE
+	cmp	#END_BYTE			; check if end of string
 	beq	done_printing
 
-	sta	(SCRN_OFFSET_LSB),y		; print message starting at $1f35 on screen
+	sta	(SCRN_OFFSET_LSB),y		; print message on screen
 	iny
 
-	jmp	print_message_loop
+	jmp	print_message_loop		; you're not done yet, function!
 
 done_printing:
 	rts

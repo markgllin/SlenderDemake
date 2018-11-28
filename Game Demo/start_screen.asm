@@ -35,10 +35,7 @@ print_logo_column:
 	sta	MSG_ADDR_LSB
 	lda     #>message	        ; get high byte of message address to print
 	sta	MSG_ADDR_MSB
-	lda	#$1f
-	sta	SCRN_OFFSET_MSB
-	lda	#$35
-	sta	SCRN_OFFSET_LSB
+
 	jsr	print_message		; common subroutines
 
 	lda     #SEED           	; init the SEEEED for RNG glitching
@@ -97,7 +94,8 @@ glitch_undo:
 ;;                 DATA                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-message:		; "PRESS SPACE TO START"  -> 20 bytes
+message:		; "PRESS SPACE TO START"  -> 22 bytes
+	dc.b	#$1f, #$35-2			; position on screen (minus 2)
 	;   	P        R        E       S        S        
 	dc.b	16+#$80, 18+#$80, 5+#$80, 19+#$80, 19+#$80, #20
 	;	S        P        A       C       E

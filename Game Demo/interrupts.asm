@@ -134,8 +134,8 @@ isr_trigger_end_game:
         sta     (SCRN_LSB),y
 
 	ldx	#$00			; check fourth digit
-	lda	SCORE_ADDRESS,x
-        sta     GAME_STATUS		; if 0, then lose (i.e score < 1000). Else, win
+	lda	#$00
+        sta     GAME_STATUS		; timer ran out, so zero (which means lose)
 
         jmp     check_timer1
 

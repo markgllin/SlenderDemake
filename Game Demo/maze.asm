@@ -4,7 +4,7 @@ generateMaze    subroutine
         ldx     #0
 .clrloop:
         sta     $1e00,x
-        sta     $1edd,x
+        sta     $1f00-#$23,x
         inx
         bne     .clrloop
 
