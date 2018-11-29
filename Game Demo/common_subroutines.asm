@@ -101,7 +101,8 @@ print_message:
 	iny
 print_message_loop:
 	lda	(MSG_ADDR_LSB),y		; grab index for characters
-	bit	#$80				; 1000 0000
+	and	#$80
+        lda	(MSG_ADDR_LSB),y				; 1000 0000
 	bmi	done_printing
 
 	ora	PRINT_MODE			; set the high bit for wrap around trick (if mode = #$80)
@@ -140,3 +141,17 @@ fill_colour_mem:		; fill colour memory with white
         rts
 
 
+place_character_sprite:
+        jsr     generateMaze
+        lda     #$2e            ; offset sprite
+        sta     SPRITE_LSB
+        sta     SPRITE_CLR_LSB
+
+        lda     #SPRITE_CHAR_COLOR
+        sta     CURR_CLR
+        lda     #CHAR_FORWARD
+        sta     CURR_SPRITE
+        draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
+
+	jsr     draw_env	; draw environment around sprite
+        rts
