@@ -101,7 +101,8 @@ print_message:
 	iny
 print_message_loop:
 	lda	(MSG_ADDR_LSB),y		; grab index for characters
-	bit	#$80				; 1000 0000
+	and	#$80
+        lda	(MSG_ADDR_LSB),y				; 1000 0000
 	bmi	done_printing
 
 	ora	PRINT_MODE			; set the high bit for wrap around trick (if mode = #$80)
