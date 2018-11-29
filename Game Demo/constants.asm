@@ -45,6 +45,7 @@ TREE_ADDRESS    = $1d70         ; where the tree starts (7472)
 
 TIMER_ADDRESS 	= $1fe4
 SCORE_ADDRESS   = $1ff6
+LEVEL_ADDRESS   = $1ff1
 
 ;;; ---- CONSTANTS
 

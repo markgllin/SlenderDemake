@@ -70,6 +70,8 @@ ROOM_SEED       = $38
 CURR_ROOM       = $39
 LETTER_STATE    = $3a
 
+LEVEL             = $3b
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;            SPLASH SCREENS              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -87,4 +89,3 @@ MSG_ADDR_MSB	= $09
 SCRN_OFFSET_LSB = $0a
 SCRN_OFFSET_MSB = $0b
 MSG_NUM_CHARS   = $0c
-

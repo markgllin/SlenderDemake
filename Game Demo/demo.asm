@@ -79,6 +79,7 @@ init_all_the_things:
 	sta     ANIMATE_STATUS
 	sta	GAME_STATUS	; if non-zero, then end the game
         sta     LETTER_STATE
+        sta     LEVEL
 
         lda     #$f6		; 4 characters away from right bottom corner
         sta     SCORE_LSB	; position of the score on screen 
@@ -87,7 +88,6 @@ init_all_the_things:
 
         lda     #$1e            ; load MSB
         sta     SPRITE_MSB
-        sta     SCORE_MSB
 
 	lda	#$1f
 	sta	SCORE_MSB
@@ -96,15 +96,6 @@ init_all_the_things:
         lda     #$96
         sta     CLRM_MSB
         sta     SPRITE_CLR_MSB
-        
-	;; init the position of the sprite at spawn
-        lda     #$03
-        sta     SPRITE_X
-        lda     #$01
-        sta     SPRITE_Y
-        
-        ;; init starting room
-        sta     CURR_ROOM
 
 	;; init all the other things
         lda     #ANIMATION_DELAY
@@ -119,22 +110,46 @@ init_all_the_things:
 
         ;; initialize the timer to 0300 and the score to 0000
         ldx     #$0
-init_timer_and_score_loop: 	
+init_score: 	
 	;; could use PRINT_STRING here but uses more bytes than doubling up
 	;; and printing both timer and score at the same time
 	;; Also, font colour should still be white from start screen - don't set
         lda     #NUM_ZERO        ; number 0
-        sta     TIMER_ADDRESS,X  ; position of timer
-	sta	SCORE_ADDRESS,X  ; position of score
+        sta	SCORE_ADDRESS,X  ; position of score
         inx
         cpx     #$04
-        bne     init_timer_and_score_loop
+        bne     init_score
 
+init_level:
+        inc     LEVEL
+	;; init the position of the sprite at spawn
+        lda     #$03
+        sta     SPRITE_X
+        lda     #$01
+        sta     SPRITE_Y
+        
+        ;; init starting room
+        sta     CURR_ROOM
+
+        ldx     #$0
+        stx     LETTER_STATE
+        lda     #NUM_ZERO        ; number 0
+init_timer:
+        sta	TIMER_ADDRESS,X  ; position of timer
+        inx
+        cpx     #$04
+        bne     init_timer  ; position of timer
+	
 	;; make timer 0300 instead of 0000 from init above
         ldy     #$01		; third digit
 	; ldy	#$03		; for debug of end screen - make it 3 seconds instead of 300
         lda     #NUM_ZERO + 3   ; number 3
         sta     TIMER_ADDRESS,y
+
+        lda     LEVEL
+        clc
+        adc     #NUM_ZERO
+        sta     LEVEL_ADDRESS
 
 	;; check win condition by automatically setting score
 	; ldy     #$00		    ; fourth digit
@@ -165,6 +180,11 @@ start_timers:
 ;;; ----- INPUT
 input:
         ;; check game status FIRST
+done_lvl:
+        lda     LETTER_STATE
+        cmp     #255
+        beq     init_level
+
         lda     GAME_STATUS
         beq     continue_game
         jsr     end_game
