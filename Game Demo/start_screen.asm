@@ -1,7 +1,7 @@
 start_screen:
 	jsr	prep_splash_screen
-	
-;;;; now that copying is done, print that thing
+	lda	#$80
+	sta	PRINT_MODE
 
 	;; store screen address MSB for plotting	
 	lda	#$1e
@@ -53,14 +53,6 @@ no_glitch:
         cmp     #SPACE_KEY
 	bne	start_input
 
-	lda	#CLEAR_CHAR
-	ldx	#$00
-clear_last_row:				; in preparation for timer + score
-	sta	TIMER_ADDRESS,X
-	inx
-	cpx	#22
-	BNE	clear_last_row
-
 	lda	MAZE_SEED
 	sta	LFSR
 	rts
@@ -96,9 +88,9 @@ glitch_undo:
 
 message:		; "PRESS SPACE TO START"  -> 22 bytes
 	dc.b	#$1f, #$35-2			; position on screen (minus 2)
-	;   	P        R        E       S        S        
-	dc.b	16+#$80, 18+#$80, 5+#$80, 19+#$80, 19+#$80, #20
-	;	S        P        A       C       E
-	dc.b	19+#$80, 16+#$80, 1+#$80, 3+#$80, 5+#$80, #20
-	;   	T        O             S        T        A       R         T
-	dc.b	20+#$80, 15+#$80, #20, 19+#$80, 20+#$80, 1+#$80, 18+#$80, 20+#$80, END_BYTE
+	;   	P   R   E  S   S        
+	dc.b	16, 18, 5, 19, 19, 32
+	;	S   P   A  C  E
+	dc.b	19, 16, 1, 3, 5, 32
+	;   	T   O       S   T   A  R   T (with high bit set)
+	dc.b	20, 15, 32, 19, 20, 1, 18, 20+$80

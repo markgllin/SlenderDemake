@@ -48,11 +48,12 @@
 ; needs sprite clr in [{1}],
 ; sprite_clr_lsb in [{2}],
 ; and sprite_lsb in [{3}]
+; and sprite character in X
         mac     draw_sprite
             lda     [{1}]
-            sta     ([{2}]),y
+            sta     ([{2}]),y		; fill colour memory
             txa
-            sta     ([{3}]),y
+            sta     ([{3}]),y		; fill screen memory
         endm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
