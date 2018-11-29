@@ -86,16 +86,9 @@ init_all_the_things:
 	lda	#$e4		; 4 characters away from left bottom corner
 	sta	SCRN_LSB	; position of the timer on screen
 
-        lda     #$1e            ; load MSB
-        sta     SPRITE_MSB
-
 	lda	#$1f
 	sta	SCORE_MSB
 	sta	SCRN_MSB
-
-        lda     #$96
-        sta     CLRM_MSB
-        sta     SPRITE_CLR_MSB
 
 	;; init all the other things
         lda     #ANIMATION_DELAY
@@ -122,6 +115,14 @@ init_score:
 
 init_level:
         inc     LEVEL
+
+        lda     #$1e            ; load MSB
+        sta     SPRITE_MSB
+        
+        lda     #$96
+        sta     CLRM_MSB
+        sta     SPRITE_CLR_MSB
+
 	;; init the position of the sprite at spawn
         lda     #$03
         sta     SPRITE_X
@@ -143,7 +144,9 @@ init_timer:
 	;; make timer 0300 instead of 0000 from init above
         ldy     #$01		; third digit
 	; ldy	#$03		; for debug of end screen - make it 3 seconds instead of 300
-        lda     #NUM_ZERO + 3   ; number 3
+        sec
+        lda     #NUM_ZERO + 4   ; number 3
+        sbc     LEVEL
         sta     TIMER_ADDRESS,y
 
         lda     LEVEL
@@ -159,19 +162,7 @@ init_timer:
         jsr     random
         sta     ROOM_SEED
 
-place_character_sprite:
-        jsr     generateMaze
-        lda     #$2e            ; offset sprite
-        sta     SPRITE_LSB
-        sta     SPRITE_CLR_LSB
-
-        lda     #SPRITE_CHAR_COLOR
-        sta     CURR_CLR
-        lda     #CHAR_FORWARD
-        sta     CURR_SPRITE
-        draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
-
-	jsr     draw_env	; draw environment around sprite
+        jsr     place_character_sprite
 
 start_timers:
         jsr	start_timer1

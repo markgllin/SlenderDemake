@@ -137,3 +137,17 @@ fill_colour_mem:		; fill colour memory with white
         rts
 
 
+place_character_sprite:
+        jsr     generateMaze
+        lda     #$2e            ; offset sprite
+        sta     SPRITE_LSB
+        sta     SPRITE_CLR_LSB
+
+        lda     #SPRITE_CHAR_COLOR
+        sta     CURR_CLR
+        lda     #CHAR_FORWARD
+        sta     CURR_SPRITE
+        draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
+
+	jsr     draw_env	; draw environment around sprite
+        rts
