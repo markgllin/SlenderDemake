@@ -53,14 +53,6 @@ no_glitch:
         cmp     #SPACE_KEY
 	bne	start_input
 
-	lda	#CLEAR_CHAR
-	ldx	#$00
-clear_last_row:				; in preparation for timer + score
-	sta	TIMER_ADDRESS,X
-	inx
-	cpx	#22
-	BNE	clear_last_row
-
 	lda	MAZE_SEED
 	sta	LFSR
 	rts
