@@ -101,10 +101,9 @@ print_message:
 	iny
 print_message_loop:
 	lda	(MSG_ADDR_LSB),y		; grab index for characters
-	and	#$80				; 1000 0000
-	bne	done_printing
+	bit	#$80				; 1000 0000
+	bmi	done_printing
 
-	lda	(MSG_ADDR_LSB),y
 	ora	PRINT_MODE			; set the high bit for wrap around trick (if mode = #$80)
 	sta	(SCRN_OFFSET_LSB),y		; print message on screen
 	iny
@@ -112,8 +111,7 @@ print_message_loop:
 	jmp	print_message_loop		; you're not done yet, function!
 
 done_printing:
-	lda	(MSG_ADDR_LSB),y		; get last character - high bit already set
-	sta	(SCRN_OFFSET_LSB),y		; print last character
+	sta	(SCRN_OFFSET_LSB),y		; high bit already set - print last character
 
 	rts
 
