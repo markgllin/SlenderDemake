@@ -131,15 +131,14 @@ init_timer_and_score_loop:
         bne     init_timer_and_score_loop
 
 	;; make timer 0300 instead of 0000 from init above
-        ;ldy     #$01		; third digit
-	ldy	#$03		; for debug of end screen - make it 3 seconds instead of 300
         lda     #NUM_ZERO + 3   ; number 3
-        sta     TIMER_ADDRESS,y
+	sta     TIMER_ADDRESS + 1	; third digit
+        ; sta     TIMER_ADDRESS + 3	; for debug of end screen - make it 3 seconds instead of 300
 
 	;; check win condition by automatically setting score
 	; ldy     #$00		    ; fourth digit
         ; lda     #NUM_ZERO + 1     ; number 1
-        ; sta     SCORE_ADDRESS,y
+        ; sta     SCORE_ADDRESS	    ; fourth digit
 
         jsr     random
         sta     ROOM_SEED
@@ -241,6 +240,11 @@ doneInput:
 ;;; ----- END GAME
 
 end_game:
+	lda	SCORE_ADDRESS + 1
+	sta	SCORE_DIGIT1
+	lda	SCORE_ADDRESS + 2
+	sta	SCORE_DIGIT2
+
         jmp     end_screen
 
         INCLUDE "maze.asm"

@@ -89,8 +89,8 @@ subOffset       subroutine
 
 
 ; expects message address in MSG_ADDR_LSB/MSB
-; expects starting address of whhere to print on screen as first two bytes of data
-; expects message to end with constant END_BYTE
+; expects starting address of where to print on screen as first two bytes of data
+; expects message to end with character with high bit set
 print_message:
 	ldy	#0
 	lda	(MSG_ADDR_LSB),y
@@ -101,21 +101,26 @@ print_message:
 	iny
 print_message_loop:
 	lda	(MSG_ADDR_LSB),y		; grab index for characters
-	cmp	#END_BYTE			; check if end of string
-	beq	done_printing
+	and	#$80				; 1000 0000
+	bne	done_printing
 
+	lda	(MSG_ADDR_LSB),y
+	ora	PRINT_MODE			; set the high bit for wrap around trick (if mode = #$80)
 	sta	(SCRN_OFFSET_LSB),y		; print message on screen
 	iny
 
 	jmp	print_message_loop		; you're not done yet, function!
 
 done_printing:
+	lda	(MSG_ADDR_LSB),y		; get last character - high bit already set
+	sta	(SCRN_OFFSET_LSB),y		; print last character
+
 	rts
 
 ;; preps for a splash screen by setting the correct colours, clearing
 ;; the entire screen, and copying the necessary characters
 prep_splash_screen:
-        lda     #20
+        lda     #32+#$80
         ldx     #0
 start_clr_loop:
         sta     $1e00,x
