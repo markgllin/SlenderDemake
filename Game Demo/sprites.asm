@@ -44,6 +44,10 @@ place_letter:
 	cmp	#128
 	bcs	letter_lower_half
 
+	;; letter spawns in upper half of screen
+	cmp	#$2e			; This is where the character spawns
+	beq	place_letter		; DON'T place it there
+
 	lda	#$1e
 	sta	LETTER_MSB
 	lda	#$96
