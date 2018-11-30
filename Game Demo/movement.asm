@@ -25,7 +25,7 @@ collision:
         beq     letter_found
         cmp     #ITEM_LETTER + 1
         bne     invalid_movement
-letter_found:				;;; TODO: ADD WIN CONDITION
+letter_found:				
         ;; found a letter!
         ;; so update the score
         lda     LETTER_STATE

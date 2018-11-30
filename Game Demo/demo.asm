@@ -116,7 +116,8 @@ init_level:
         ldx     #1
         cpx     LEVEL
         bne     render_sprites
-        jsr     end_screen
+	sta	GAME_STATUS
+        jsr     end_game
 render_sprites:
         inc     LEVEL
         lda     #$1e            ; load MSB

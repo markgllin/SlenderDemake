@@ -66,7 +66,7 @@ forever:
 win_message:	;; YOU ESCAPED --> 14 bytes
 	dc.b	#$1e, #$5d-2			; screen position (minus 2)
 	;	Y   O   U
-	dc.b	25, 15, 21, 32,			; 32 = space
+	dc.b	25, 15, 21, 32		; 32 = space
 	;       E   S   C  A  P   E  D  ! (with high bit set)
 	dc.b	5,  19, 3, 1, 16, 5, 4, 33+#$80
 	
