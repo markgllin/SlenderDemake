@@ -42,8 +42,10 @@ print_win_lose:
 
 print_level_and_score
 	;; print the level
-	lda	#NUM_ZERO		; CHANGE THIS
-	sta	$1eee
+	lda     LEVEL
+	clc
+	adc     #NUM_ZERO
+	sta     $1eee		; CHANGE THIS
 
 	;; print the score
 	lda	#NUM_ZERO

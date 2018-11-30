@@ -31,9 +31,9 @@ start:
         sta     AUX_C
 
         ;; load zeros into the "0" character of our custom charset
-        ldx     #$00
-        lda     #$00
-copy_blank:
+        ldx     #$00                                                ;; DO NOT MOVE THIS NOR THE COPY_SPRITE FUNCTION. 
+        txa                                                         ;; THEY NEED TO BE TOGETHER.
+copy_blank:                                                        
         sta     SPACE_ADDRESS,X
         inx
         cpx     #48
@@ -63,7 +63,7 @@ copy_blank:
 ; 	bne	copy_blank3_debug
 
         ;; character sprites = first 256 bytes
-        ldx     #00
+        TAX
 copy_sprites:
         lda     sprite,X
         sta     SPRITE_ADDRESS,X
@@ -102,20 +102,23 @@ init_all_the_things:
 	jsr	play_notes
 
         ;; initialize the timer to 0300 and the score to 0000
-        ldx     #$0
+        ldx     #4
+        lda     #NUM_ZERO        ; number 0
 init_score: 	
 	;; could use PRINT_STRING here but uses more bytes than doubling up
 	;; and printing both timer and score at the same time
 	;; Also, font colour should still be white from start screen - don't set
-        lda     #NUM_ZERO        ; number 0
-        sta	SCORE_ADDRESS,X  ; position of score
-        inx
-        cpx     #$04
+        sta	SCORE_ADDRESS-1,X  ; position of score
+        dex
         bne     init_score
 
 init_level:
+        ldx     #1
+        cpx     LEVEL
+        bne     render_sprites
+        jsr     end_screen
+render_sprites:
         inc     LEVEL
-
         lda     #$1e            ; load MSB
         sta     SPRITE_MSB
         
@@ -180,13 +183,12 @@ done_lvl:
 
 continue_game:
         ;; not end game so continue
-        ldx     #$00
+        ldx     #$25            ; add delay
         stx     FRAME
 .frame:
         lda     RASTER          ; raster beam line number
         bne     .frame
-        inx                	; increase frame counter
-        cpx     #$19            ; add delay
+        dex                	; increase frame counter        
         bne     .frame
         
         lda     SCAN_KEYBOARD
