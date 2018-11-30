@@ -94,7 +94,6 @@ isr_first_digit:                ; check the first figit (1 second)
         jmp     check_timer1
 
 isr_first_wrap_around:		; first digit (1 second) wrapped around
-        inc     NUM_WRAPS
         lda     #NUM_NINE
         sta     (SCRN_LSB),y
 	
@@ -103,26 +102,12 @@ isr_first_wrap_around:		; first digit (1 second) wrapped around
         jmp     check_timer1	; no wrap so get next IRQ
 
 isr_second_wrap_around:		; second digit (10 seconds) wrapped around	
-        inc     NUM_WRAPS
         lda     #NUM_NINE
         sta     (SCRN_LSB),y
 
 	;; check the third digit (100 seconds)
-	check_wrap	#$01,isr_third_wrap_around 	; MACRO
+	check_wrap	#$01,isr_trigger_end_game	; MACRO
         jmp     check_timer1	; no wrap so get next IRQ
-
-isr_third_wrap_around:	;	; third digit (100 seconds) wrapped around
-        inc     NUM_WRAPS
-        lda     NUM_WRAPS
-        cmp     #$03		; check if timer reached 0000
-        beq     isr_trigger_end_game
-
-        lda     #$00            ; NOT end game so reset wraps
-        sta     NUM_WRAPS
-        lda     #NUM_NINE
-        sta     (SCRN_LSB),y
-
-        jmp     check_timer1	
 
 isr_trigger_end_game:
         ;; reset timer to ZERO since wrap around for first

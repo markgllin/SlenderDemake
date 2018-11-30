@@ -11,9 +11,7 @@ CURR_SPRITE     = $08           ; stores the starting character for current spri
 FRAME           = $09           ; frame counter for delays
 CURR_CLR        = $0a           ; stores the current character colour
 TIMER_CTR       = $0b           ; timer counter
-NUM_WRAPS       = $0c           ; used to figure out end game condition
-        ; basically, counts the number of times the numbers wrap per decrement
-        ; If this reaches 3, then FULL WRAP AROUND so end game
+
 SPRITE_X        = $0d
 SPRITE_Y        = $0e
 SPRITE_PREV_X   = $0f

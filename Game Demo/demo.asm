@@ -75,7 +75,6 @@ init_all_the_things:
         lda     #$00            
         sta     SCRN_LSB
         sta     CLRM_LSB
-	sta     NUM_WRAPS
 	sta     ANIMATE_STATUS
 	sta	GAME_STATUS	; if non-zero, then end the game
         sta     LETTER_STATE
@@ -112,6 +111,10 @@ init_score:
         dex
         bne     init_score
 
+start_timers:
+        jsr	start_timer1
+	jsr	start_timer2
+
 init_level:
         ldx     #1
         cpx     LEVEL
@@ -145,11 +148,11 @@ init_timer:
         cpx     #$04
         bne     init_timer  ; position of timer
 	
-	;; make timer 0300 instead of 0000 from init above
+	;; make timer 0x00 instead of 0000 from init above where x corresponds to level
         sec
-        lda     #NUM_ZERO + 4   ; number 3
+        lda     #NUM_ZERO + 4   ; number 4
         sbc     LEVEL
-        sta     TIMER_ADDRESS + 1
+        sta     TIMER_ADDRESS + 1 ; third digit
 
         lda     LEVEL
         clc
@@ -166,23 +169,19 @@ init_timer:
 
         jsr     place_character_sprite
 
-start_timers:
-        jsr	start_timer1
-	jsr	start_timer2
-
 ;;; ----- INPUT
 input:
         ;; check game status FIRST
 done_lvl:
-        lda     LETTER_STATE
-        cmp     #255
-        beq     init_level
-
-        lda     GAME_STATUS
+	lda     GAME_STATUS
         beq     continue_game
         jsr     end_game
 
 continue_game:
+        lda     LETTER_STATE
+        cmp     #255
+        beq     init_level
+
         ;; not end game so continue
         ldx     #$25            ; add delay
         stx     FRAME
