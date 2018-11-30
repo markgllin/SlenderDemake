@@ -315,11 +315,7 @@ drawPath        subroutine
         sta     (MAZE_LSB),y
         iny
         sta     (MAZE_LSB),y
-        TYA
-        CLC
-        adc     #21
-        TAY
-        lda     #PATH
+        ldy     #22
         sta     (MAZE_LSB),y
         iny
         sta     (MAZE_LSB),y
@@ -329,8 +325,6 @@ maskTrees       subroutine
         lda     #0
         sta     MAZE_X_COORD
         sta     MAZE_Y_COORD
-
-        lda     #$00            ; load LSB
         sta     MAZE_LSB
 
         lda     #$1e            ; load MSB
@@ -355,10 +349,7 @@ maskTrees       subroutine
         sta     (MAZE_LSB),y
 
 .drawBottomLeft
-        TYA
-        CLC
-        adc     #21
-        TAY
+        ldy     #22
 
         lda     (MAZE_LSB),y
         cmp     #1
@@ -377,10 +368,7 @@ maskTrees       subroutine
         sta     (MAZE_LSB),y
 
 .drawNextBlock
-        TYA
-        CLC
-        adc     #2
-        TAY
+
         lda     MAZE_LSB
         ldx     #2
         stx     OFFSET
