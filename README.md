@@ -7,7 +7,7 @@ TODO:
 
 - ~~collision detection~~
 - ~~title screen~~
-- end game screen - doneish but I want it to be BETTER, plus "you win" condition is wrong
+- ~~end game screen~~
 - ~~score~~
 - ~~timer~~
 - ~~flashlight effect~~
