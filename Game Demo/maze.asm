@@ -8,14 +8,14 @@ generateMaze    subroutine
         inx
         bne     .clrloop
 
-        lda     #2              ; need to randomize this some how
+        lda     #2                              ; need to randomize this some how
         sta     MAZE_X_COORD
         sta     MAZE_Y_COORD
 
-        lda     #$2e            ; load LSB
+        lda     #$2e                            ; load LSB
         sta     MAZE_LSB
 
-        lda     #$1e            ; load MSB
+        lda     #$1e                            ; load MSB
         sta     MAZE_MSB
 
         lda     #MAZE_ORIGIN
@@ -327,7 +327,7 @@ maskTrees       subroutine
         sta     MAZE_Y_COORD
         sta     MAZE_LSB
 
-        lda     #$1e            ; load MSB
+        lda     #$1e                            ; load MSB
         sta     MAZE_MSB
 
 .drawTopLeft
@@ -415,7 +415,7 @@ checkDoorways   subroutine
 .checkExit
         cmp     #0
         bne     .keepMaze
-.newMazeLeft            ; player at exit, generate room on left
+.newMazeLeft                                    ; player at exit, generate room on left
         lda     #MAZE_ENTRANCE_X_COORD
         sta     SPRITE_X
 
@@ -429,7 +429,7 @@ checkDoorways   subroutine
         asl     CURR_ROOM
 
         jmp     .makeMaze
-.newMazeRight           ; player at entrance, generate room on right
+.newMazeRight                                   ; player at entrance, generate room on right
         lda     #MAZE_EXIT_X_COORD
         sta     SPRITE_X
 

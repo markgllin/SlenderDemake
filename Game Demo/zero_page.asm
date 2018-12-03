@@ -1,16 +1,16 @@
 
 ;;; ---- ZERO PAGE
-SCRN_LSB        = $00           ; LSB of screen memory address
-SCRN_MSB        = $01           ; MSB Of screen memory address
-CLRM_LSB        = $04           ; LSB of colour memory address
-CLRM_MSB        = $05           ; MSB Of colour memory address
+SCRN_LSB        = $00                           ; LSB of screen memory address
+SCRN_MSB        = $01                           ; MSB Of screen memory address
+CLRM_LSB        = $04                           ; LSB of colour memory address
+CLRM_MSB        = $05                           ; MSB Of colour memory address
 
-GAME_STATUS     = $07           ; if this is not 0, end game
+GAME_STATUS     = $07                           ; if this is not 0, end game
 
-CURR_SPRITE     = $08           ; stores the starting character for current sprite
-FRAME           = $09           ; frame counter for delays
-CURR_CLR        = $0a           ; stores the current character colour
-TIMER_CTR       = $0b           ; timer counter
+CURR_SPRITE     = $08                           ; stores the starting character for current sprite
+FRAME           = $09                           ; frame counter for delays
+CURR_CLR        = $0a                           ; stores the current character colour
+TIMER_CTR       = $0b                           ; timer counter
 
 SPRITE_X        = $0d
 SPRITE_Y        = $0e
@@ -68,27 +68,27 @@ ROOM_SEED       = $38
 CURR_ROOM       = $39
 LETTER_STATE    = $3a
 
-LEVEL             = $3b
+LEVEL           = $3b
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;            SPLASH SCREENS              ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SP_SCREEN_LSB	= $00
-SP_SCREEN_MSB 	= $01
+SP_SCREEN_LSB   = $00
+SP_SCREEN_MSB   = $01
 CHAR_NUM_CTR    = $03
-GLITCH_CTR	= $04
-MAZE_SEED	= $05
+GLITCH_CTR      = $04
+MAZE_SEED       = $05
 
 ;; SKIP $07 FOR END GAME CONDITION
 
 MSG_ADDR_LSB    = $08
-MSG_ADDR_MSB	= $09
+MSG_ADDR_MSB    = $09
 SCRN_OFFSET_LSB = $0a
 SCRN_OFFSET_MSB = $0b
 
-SCORE_DIGIT1	= $0c
-SCORE_DIGIT2	= $0d
+SCORE_DIGIT1    = $0c
+SCORE_DIGIT2    = $0d
 
-PRINT_MODE	= $0e
+PRINT_MODE      = $0e
 

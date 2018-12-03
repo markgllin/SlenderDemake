@@ -51,11 +51,11 @@
 ; and sprite character in X
         mac     draw_sprite
             lda     [{1}]
-            sta     ([{2}]),y		; fill colour memory
+            sta     ([{2}]),y                       ; fill colour memory
             txa
-            sta     ([{3}]),y		; fill screen memory
+            sta     ([{3}]),y                       ; fill screen memory
         endm
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; needs sprite to draw in [{1}],
@@ -64,19 +64,19 @@
 ; sprite_lsb in [{4}]
         mac     draw_char
             ldx     [{1}]
-            ldy     #$00            ; draw 1st char
+            ldy     #$00                            ; draw 1st char
             draw_sprite [{2}], [{3}], [{4}]
-            inx                     ; draw 2nd char
+            inx                                     ; draw 2nd char
             ldy     #$16
             draw_sprite [{2}], [{3}], [{4}]
-            inx                     ; draw 3rd char
+            inx                                     ; draw 3rd char
             ldy     #$01
             draw_sprite [{2}], [{3}], [{4}]
-            inx                     ; draw 4th char
+            inx                                     ; draw 4th char
             ldy     #$17
             draw_sprite [{2}], [{3}], [{4}]
         endm
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; needs sprite to erase in [{1}],
@@ -85,7 +85,7 @@
 ; sprite_lsb in [{4}]
         mac     erase_char
             ldx     [{1}]
-            ldy     #$00            ; draw 1st char
+            ldy     #$00                            ; draw 1st char
             draw_sprite [{2}], [{3}], [{4}]
             ldy     #$16
             draw_sprite [{2}], [{3}], [{4}]
@@ -94,7 +94,7 @@
             ldy     #$17
             draw_sprite [{2}], [{3}], [{4}]
         endm
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; needs offset in [{1}]
@@ -129,8 +129,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; needs digit number in [{1}]
 ; needs branch in [{2}]
-	mac	check_wrap
-            ldy     #[{1}]           ; check digit #[{1}]
+        mac     check_wrap
+            ldy     #[{1}]                          ; check digit #[{1}]
             lda     (SCRN_LSB),y
             cmp     #NUM_ZERO
             beq     [{2}]
@@ -138,22 +138,22 @@
             sec
             sbc     #$01
             sta     (SCRN_LSB),y
-	endm
+        endm
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	    
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; needs voice index in [{1}]
 ; needs voice notes in [{2}]
-	mac	next_note
-	    ldx     [{1}]
-            inx			; incrementing 3 times actually takes less bytes
-            inx			; than adding 3 using the accumulator and transfering
+        mac     next_note
+            ldx     [{1}]
+            inx                                     ; incrementing 3 times actually takes less bytes
+            inx                                     ; than adding 3 using the accumulator and transfering
             inx
-            lda     [{2}],X 
-	    stx     [{1}]
-	endm
-;;;;;;;;;;;;;;;;;;;;;;;;;;;
+            lda     [{2}],X
+            stx     [{1}]
+        endm
+        ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 

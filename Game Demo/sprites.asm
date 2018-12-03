@@ -33,33 +33,33 @@ done_animate:
 
 ;;; ----- DRAWING ROUTINES
 
-place_letter: 
-	jsr     random
-	lda	LFSR			
-	and	#$fe			; This avoids clipping through trees
+place_letter:
+        jsr     random
+        lda     LFSR
+        and     #$fe                            ; This avoids clipping through trees
 
         sta     LETTER_LSB
         sta     LETTER_CLR_LSB
 
-	cmp	#128
-	bcs	letter_lower_half
+        cmp     #128
+        bcs     letter_lower_half
 
-	;; letter spawns in upper half of screen
-	cmp	#$2e			; This is where the character spawns
-	beq	place_letter		; DON'T place it there
+        ;; letter spawns in upper half of screen
+        cmp     #$2e                            ; This is where the character spawns
+        beq     place_letter                    ; DON'T place it there
 
-	lda	#$1e
-	sta	LETTER_MSB
-	lda	#$96
-	sta	LETTER_CLR_MSB
+        lda     #$1e
+        sta     LETTER_MSB
+        lda     #$96
+        sta     LETTER_CLR_MSB
 
-	jmp	spawn_letter
+        jmp     spawn_letter
 
 letter_lower_half:
-	lda	#$1f
-	sta	LETTER_MSB
-	lda	#$97
-	sta	LETTER_CLR_MSB
+        lda     #$1f
+        sta     LETTER_MSB
+        lda     #$97
+        sta     LETTER_CLR_MSB
 
 spawn_letter:
         ldy     #$0
@@ -67,9 +67,9 @@ spawn_letter:
         cmp     #PATH
         bne     place_letter
 
-	lda     #ITEM_LETTER
+        lda     #ITEM_LETTER
         sta     (LETTER_LSB),y
-	lda     #$01
+        lda     #$01
         sta     (LETTER_CLR_LSB),y
 
         ldy     #$1
@@ -82,7 +82,7 @@ spawn_letter:
         lda     #$01
         sta     (LETTER_CLR_LSB),y
 
-	rts
+        rts
 
 erase:
         erase_char #PATH, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
@@ -91,7 +91,7 @@ erase:
 draw_env:       subroutine
 .draw_NW_tree
         update_tree_addr #46, SPRITE_LSB, SPRITE_MSB, SPRITE_CLR_LSB, SPRITE_CLR_MSB, subOffset; use player location and offset by -46 to draw (top left) tree
-        beq     .draw_N_tree    ; if it's a path, don't draw
+        beq     .draw_N_tree                    ; if it's a path, don't draw
         jsr     applyMask
 .draw_N_tree
         update_tree_addr #2, TREE_LSB, TREE_MSB, TREE_CLR_LSB, TREE_CLR_MSB, addOffset
@@ -125,10 +125,10 @@ draw_env:       subroutine
         rts
 
 applyMask       subroutine
-        lda     SPRITE_Y        ; boundary check for entrance and exit of maze
+        lda     SPRITE_Y                        ; boundary check for entrance and exit of maze
         cmp     #9
-        beq     .checkSpriteX   ; (3,9) and (20,9) are the boundaries for drawing trees
-.drawAllSegments                ; otherwise, trees will wrap around screen
+        beq     .checkSpriteX                   ; (3,9) and (20,9) are the boundaries for drawing trees
+.drawAllSegments                                ; otherwise, trees will wrap around screen
         ldx     TREE1
         ldy     #$00
         jsr     treeSegments

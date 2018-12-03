@@ -8,11 +8,11 @@ random          subroutine
         ldy     LFSR
         lsr     LFSR
         lsr     LFSR
-        eor     LFSR            ; 6th tap
+        eor     LFSR                            ; 6th tap
         lsr     LFSR
-        eor     LFSR            ; 5th tap
+        eor     LFSR                            ; 5th tap
         lsr     LFSR
-        eor     LFSR            ; 4th tap
+        eor     LFSR                            ; 4th tap
         and     #1
         sty     LFSR
         lsr     LFSR
@@ -28,12 +28,12 @@ random          subroutine
 ; returns values in OFFSET, LSB, AND MSB
 ; also returns MSB accumulator
 addOffset       subroutine
-        clc                     ; clear the carry
-        adc     OFFSET          ; add to LSB
-        sta     LSB             ; store result in LSB
+        clc                                     ; clear the carry
+        adc     OFFSET                          ; add to LSB
+        sta     LSB                             ; store result in LSB
         TXA
-        adc     #0              ; add carry to MSB
-        sta     MSB             ; store MSB
+        adc     #0                              ; add carry to MSB
+        sta     MSB                             ; store MSB
         rts
 
 ; needs LSB in accumulator and MSB in X
@@ -92,29 +92,29 @@ subOffset       subroutine
 ; expects starting address of where to print on screen as first two bytes of data
 ; expects message to end with character with high bit set
 print_message:
-	ldy	#0
-	lda	(MSG_ADDR_LSB),y
-	sta	SCRN_OFFSET_MSB
-	iny
-	lda	(MSG_ADDR_LSB),y
-	sta	SCRN_OFFSET_LSB
-	iny
+        ldy     #0
+        lda     (MSG_ADDR_LSB),y
+        sta     SCRN_OFFSET_MSB
+        iny
+        lda     (MSG_ADDR_LSB),y
+        sta     SCRN_OFFSET_LSB
+        iny
 print_message_loop:
-	lda	(MSG_ADDR_LSB),y		; grab index for characters
-	and	#$80
-        lda	(MSG_ADDR_LSB),y				; 1000 0000
-	bmi	done_printing
+        lda     (MSG_ADDR_LSB),y                ; grab index for characters
+        and     #$80
+        lda     (MSG_ADDR_LSB),y                ; 1000 0000
+        bmi     done_printing
 
-	ora	PRINT_MODE			; set the high bit for wrap around trick (if mode = #$80)
-	sta	(SCRN_OFFSET_LSB),y		; print message on screen
-	iny
+        ora     PRINT_MODE                      ; set the high bit for wrap around trick (if mode = #$80)
+        sta     (SCRN_OFFSET_LSB),y             ; print message on screen
+        iny
 
-	jmp	print_message_loop		; you're not done yet, function!
+        jmp     print_message_loop              ; you're not done yet, function!
 
 done_printing:
-	sta	(SCRN_OFFSET_LSB),y		; high bit already set - print last character
+        sta     (SCRN_OFFSET_LSB),y             ; high bit already set - print last character
 
-	rts
+        rts
 
 ;; preps for a splash screen by setting the correct colours, clearing
 ;; the entire screen, and copying the necessary characters
@@ -127,23 +127,23 @@ start_clr_loop:
         inx
         bne     start_clr_loop
 
-	lda     #8              ; border black, screen black (ref p. 265)
+        lda     #8                              ; border black, screen black (ref p. 265)
         sta     SCR_C
 
-	ldx	#00		
-	lda	#01
-fill_colour_mem:		; fill colour memory with white
-	sta	COLOR_MEM,X
-	sta	COLOR_MEM+#$ff,X
-	inx
-	bne	fill_colour_mem
+        ldx     #00
+        lda     #01
+fill_colour_mem:                                ; fill colour memory with white
+        sta     COLOR_MEM,X
+        sta     COLOR_MEM+#$ff,X
+        inx
+        bne     fill_colour_mem
 
         rts
 
 
 place_character_sprite:
         jsr     generateMaze
-        lda     #$2e            ; offset sprite
+        lda     #$2e                            ; offset sprite
         sta     SPRITE_LSB
         sta     SPRITE_CLR_LSB
 
@@ -153,5 +153,5 @@ place_character_sprite:
         sta     CURR_SPRITE
         draw_char CURR_SPRITE, CURR_CLR, SPRITE_CLR_LSB, SPRITE_LSB
 
-	jsr     draw_env	; draw environment around sprite
+        jsr     draw_env                        ; draw environment around sprite
         rts
