@@ -24,9 +24,13 @@ you_lose:
 	lda     #>lose_message	        ; get high byte of message address to print
 	sta	MSG_ADDR_MSB
 
-
 print_win_lose:
 	jsr	print_message		; common subroutines
+
+	lda	#$1e			; reposition the level word
+	sta	level_message
+	lda	#$de-2
+	sta	level_message+1
 
 	lda	#<level_message
 	sta	MSG_ADDR_LSB
@@ -79,7 +83,7 @@ lose_message:	;; YOU LOSE --> 10 bytes
 	dc.b	12, 15, 19, 5+#$80
 
 level_message: 
-	dc.b	#$1e, #$de-2
+	dc.b	#$1f,#$ec-2
 	;	L   E  V   E  L (with high bit set)
 	dc.b	12, 5, 22, 5, 12+#$80
 

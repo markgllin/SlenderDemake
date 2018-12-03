@@ -111,9 +111,14 @@ init_score:
         dex
         bne     init_score
 
+	lda	#<level_message
+	sta	MSG_ADDR_LSB
+	lda	#>level_message
+	sta	MSG_ADDR_MSB
+	jsr	print_message
+
 start_timers:
         jsr	start_timer1
-	jsr	start_timer2
 
 init_level:
         ldx     #3
@@ -153,6 +158,8 @@ init_timer:
         lda     #NUM_ZERO + 4   ; number 4
         sbc     LEVEL
         sta     TIMER_ADDRESS + 1 ; third digit
+
+	jsr	start_timer2
 
         lda     LEVEL
         clc
