@@ -49,12 +49,12 @@ print_level_and_score
 
 	;; print the score
 	lda	#NUM_ZERO
-	sta	$1f17
+	sta	$1f19
 	sta	$1f1a
 	lda	SCORE_DIGIT1
-	sta	$1f18
+	sta	$1f17
 	lda	SCORE_DIGIT2
-	sta	$1f19
+	sta	$1f18
 
 forever:
 	jmp	forever

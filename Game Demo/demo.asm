@@ -116,7 +116,7 @@ start_timers:
 	jsr	start_timer2
 
 init_level:
-        ldx     #1
+        ldx     #3
         cpx     LEVEL
         bne     render_sprites
 	sta	GAME_STATUS
@@ -252,9 +252,9 @@ doneInput:
 ;;; ----- END GAME
 
 end_game:
-	lda	SCORE_ADDRESS + 1
+	lda	SCORE_ADDRESS + 0
 	sta	SCORE_DIGIT1
-	lda	SCORE_ADDRESS + 2
+	lda	SCORE_ADDRESS + 1
 	sta	SCORE_DIGIT2
 
         jmp     end_screen
