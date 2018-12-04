@@ -41,6 +41,11 @@ place_letter:
         sta     LETTER_LSB
         sta     LETTER_CLR_LSB
 
+        cmp     #$2e
+        beq     place_letter
+        cmp     #$44
+        beq     place_letter
+
         cmp     #128
         bcs     letter_lower_half
 
