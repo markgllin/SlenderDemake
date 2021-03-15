@@ -33,6 +33,9 @@ load:	lda	smile,X		; actually load the smiley face into the place
 	cpx	#8
 	bne	load
 	
+test:	lda	#$90
+	sta	$1e00
+
 	rts
 
 smile:	dc.b	60,66,165,129,165,153,66,60

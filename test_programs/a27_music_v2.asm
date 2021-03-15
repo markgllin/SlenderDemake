@@ -14,6 +14,12 @@ OLD_IRQ      = $eabf
 VIA_CONTROL  = $911b
 VIA_FLAGS    = $911d		; reference: page 218
 VIA_ENABLE   = $911e
+
+TIMER1_L     = $9114		; timer 1 low order byte
+TIMER1_H     = $9115		; timer 1 high order byte
+TIMER1_LTL   = $9116		; timer 1 low byte to load
+TIMER1_HTL   = $9117		; timer 1 high byte to load
+	
 TIMER2_L     = $9118		; timer 2 low order byte
 TIMER2_H     = $9119		; timer 2 high order byte
 
